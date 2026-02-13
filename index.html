@@ -3,14 +3,14 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>Will You? — Spin the Love Wheel (polished)</title>
+<title>Will You? — Spin the Love Wheel (final fix)</title>
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;600;800&display=swap" rel="stylesheet">
 <style>
 :root{
   --bg1:#0b1020; --bg2:#151a33;
   --accent:#ff4d8d; --accent2:#ff96b8; --muted:#bfc4d0; --slice-text:#2b2b2f;
   --valentine-red: #ff3b5c;
-  --modal-green-start: #e2ffe8;  /* slightly stronger mint */
+  --modal-green-start: #e2ffe8;
   --modal-green-end:   #cfffe0;
   --modal-text: #083f2b;
 }
@@ -52,7 +52,7 @@ svg#wheel{ width:98%; height:auto; display:block; border-radius:50%; filter: dro
 .card h2{ color:var(--valentine-red); margin:0 0 8px 0; }
 .card p{ margin:0 0 12px 0; color:var(--modal-text); }
 .btn-row{ display:flex; gap:12px; justify-content:center; margin-top:12px; flex-wrap:wrap; }
-.btn { padding:10px 14px; border-radius:10px; font-weight:800; cursor:pointer; border:none; }
+.btn { padding:10px 14px; border-radius:10px; border:none; font-weight:800; cursor:pointer; }
 .btn.ghost{ background:transparent; color:var(--modal-text); border:1px solid rgba(7,90,62,0.08); }
 .btn.accept{ background:var(--valentine-red); color:white; }
 
@@ -60,7 +60,6 @@ svg#wheel{ width:98%; height:auto; display:block; border-radius:50%; filter: dro
 path.highlight {
   fill: var(--valentine-red) !important;
   stroke: rgba(0,0,0,0.08);
-  /* allow transform on SVG shapes, and animate scale for subtle pulse */
   transform-box: fill-box;
   transform-origin: 200px 200px;
   animation: slicePulse 1.6s infinite;
@@ -72,12 +71,11 @@ path.highlight {
   100% { transform: scale(1); }
 }
 
-/* highlighted label style (applied via JS) */
+/* highlighted label style */
 text.highlightLabel {
   font-size:16px !important;
   font-weight:900 !important;
   fill:#ffffff !important;
-  /* add a tiny text shadow via duplicate drop shadow using filter (SVG) is complex; white + bold is enough */
 }
 
 /* final full-screen message */
@@ -144,18 +142,27 @@ text.highlightLabel {
 const YOUR_NAME = "Louie";
 const HEROINE_NAME = "Hulky";
 
+/* slices: removed Flowers; rebalanced colors below */
 const slices = [
   { label: "Kiss", emoji: "😘" },
   { label: "Hug", emoji: "🤗" },
   { label: "Chocolate", emoji: "🍫" },
   { label: "Surprise", emoji: "🎁" },
   { label: "Date Night", emoji: "🌃" },
-  { label: "Flowers", emoji: "🌹" },
   { label: "Movie", emoji: "🎬" },
   { label: "Be my Valentine", emoji: "💘", target:true }
 ];
 
-const sliceColors = ["#ffdce6","#fff0f6","#ffdfe9","#fff7fb","#ffeef6","#fff3f8","#fff6fb","#ffcfe0"];
+/* Rebalance color array to match slice count exactly */
+const sliceColors = (() => {
+  // pleasing pink palette equal to slice count
+  const palette = ["#ffdce6","#fff0f6","#ffdfe9","#fff7fb","#ffeef6","#fff3f8","#ffcfe0"];
+  // if the palette length differs, generate a repeated map trimmed to length
+  if(palette.length >= slices.length) return palette.slice(0, slices.length);
+  const out = [];
+  for(let i=0;i<slices.length;i++) out.push(palette[i % palette.length]);
+  return out;
+})();
 
 /* =============================
    DOM REFS
@@ -170,7 +177,7 @@ const finalScreen = document.getElementById('finalScreen');
 const confettiCanvas = document.getElementById('confetti');
 const modalText = document.getElementById('modalText');
 
-let rotation = 0;           // current rotor rotation in degrees
+let rotation = 0;           // current rotor rotation in degrees (absolute)
 let spinning = false;
 let confirmed = false;
 
@@ -261,13 +268,25 @@ function updateLabelPositions(currentRotationDeg){
 }
 
 /* =============================
-   Spin math & animation
+   Robust spin math & animation (FIX)
+   - normalize current rotation
+   - compute exact absolute final rotation > current
+   - animate to final
+   - SNAP exactly to desired final at the end to avoid float drift
    ============================= */
-function computeFinalRotation(currentRotationDeg, targetIndex, minFullSpins=6){
-  const targetMid = (targetIndex + 0.5) * ARC;
+function normalizeDeg(d){
+  return ((d % 360) + 360) % 360;
+}
+
+function computeFinalRotationStrict(currentRotationDeg, targetIndex, minFullSpins=6){
+  // target mid angle relative to top (-90 start)
+  const targetMid = (targetIndex + 0.5) * ARC; // degrees
+  // rotor angle needed so target sits under pointer:
   const desiredOffset = (360 - targetMid) % 360;
+  // base final
   let final = minFullSpins * 360 + desiredOffset;
-  while(final <= currentRotationDeg + 0.0001){
+  // ensure it's strictly greater than current absolute rotation
+  while(final <= currentRotationDeg + 1e-6){
     final += 360;
   }
   return final;
@@ -296,6 +315,7 @@ function animateTo(from, to, duration=1200, easing='easeOut'){
   });
 }
 
+/* small beep */
 function beep(freq=560, len=0.05){
   try{
     const ctx = new (window.AudioContext || window.webkitAudioContext)();
@@ -307,6 +327,7 @@ function beep(freq=560, len=0.05){
   }catch(e){}
 }
 
+/* spin routine with strict snap at end */
 async function spin(){
   if(spinning || confirmed) return;
   spinning = true;
@@ -315,22 +336,29 @@ async function spin(){
 
   const targetIdx = slices.findIndex(s=>s.target);
 
-  // fake quick spin
+  // quick fake spin to look random
   const fakeIdx = Math.floor(Math.random() * TOTAL);
-  const fakeTo = computeFinalRotation(rotation, fakeIdx, 3 + Math.floor(Math.random()*2));
+  // use smaller spins for fake so the final still feels like a proper long spin
+  const fakeTo = computeFinalRotationStrict(rotation, fakeIdx, 3 + Math.floor(Math.random()*2));
   await animateTo(rotation, fakeTo, 700, 'cubic');
+  await new Promise(r=>setTimeout(r, 150));
 
-  await new Promise(r=>setTimeout(r, 160));
-
-  // final exact spin
-  const finalTo = computeFinalRotation(rotation, targetIdx, 6);
+  // compute true final and animate
+  const finalTo = computeFinalRotationStrict(rotation, targetIdx, 6);
   await animateTo(rotation, finalTo, 1400, 'easeOut');
 
-  rotation = rotation % 360;
+  // SNAP exactly in case of float errors:
+  // desired rotor angle that aligns target exactly:
+  const normalizedFinal = normalizeDeg(finalTo);
+  rotation = normalizedFinal; // set absolute to normalized angle
+  rotor.setAttribute('transform', `rotate(${rotation} ${CX} ${CY})`);
+  updateLabelPositions(rotation);
+
+  // done
   spinning = false;
   spinBtn.disabled = false;
 
-  // highlight and open modal
+  // highlight & modal
   highlightTarget();
   openModal();
 }
