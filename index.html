@@ -3,289 +3,422 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>Louie ❤️ Hulky</title>
+<title>Louie ❤️ Hulky — Spin the Love Wheel</title>
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;600;800&display=swap" rel="stylesheet">
 <style>
 :root{
-  --bg1:#0b1020;
-  --bg2:#151a33;
-  --accent:#ff4d8d;
-  --accent2:#ff85b3;
+  --bg:#fff7fb;        /* very light pink page */
+  --card:#fff;         /* cards / panels */
+  --muted:#6b6b74;     /* muted text (readable on white) */
+  --accent:#ff4d8d;    /* primary pink */
+  --accent-2:#ff96b8;  /* secondary pink */
+  --soft:#ffe9f1;      /* soft slice color */
+  --soft-2:#fff0f6;    /* alternating soft slice */
+  --chip-bg:#fff0f9;   /* chip background */
+  --chip-border: rgba(255,77,141,0.08);
+  --chip-text:#2b2b2f; /* chip text darker for contrast */
+  --pointer-shadow: rgba(255,77,141,0.12);
+  --glass: rgba(0,0,0,0.04);
 }
 *{box-sizing:border-box}
+html,body{height:100%; margin:0}
 body{
-  margin:0;
-  font-family:"Poppins",sans-serif;
-  background:linear-gradient(180deg,var(--bg1),var(--bg2));
-  color:white;
+  font-family:"Poppins",system-ui,-apple-system,Segoe UI,Roboto,Arial;
+  background: linear-gradient(180deg, #fff7fb 0%, #fff3f8 100%);
+  color:var(--chip-text);
   display:flex;
   align-items:center;
   justify-content:center;
-  min-height:100vh;
-  overflow:hidden;
+  padding:28px;
+  -webkit-font-smoothing:antialiased;
+  -moz-osx-font-smoothing:grayscale;
 }
 
-/* Falling hearts background */
-.hearts{
-  position:fixed;
-  inset:0;
-  pointer-events:none;
-  z-index:0;
-}
-.heart{
-  position:absolute;
-  opacity:0.25;
-  animation: fall linear infinite;
-}
-@keyframes fall{
-  from{ transform:translateY(-10vh) rotate(0deg); }
-  to{ transform:translateY(110vh) rotate(360deg); }
-}
+/* BACKGROUND HEARTS (subtle, pale) */
+.hearts{ position:fixed; inset:0; pointer-events:none; z-index:0; }
+.heart{ position:absolute; opacity:0.26; animation: fall linear infinite; filter:drop-shadow(0 2px 6px rgba(0,0,0,0.04)); }
+@keyframes fall{ from{ transform:translateY(-10vh) rotate(0deg); } to{ transform:translateY(110vh) rotate(360deg); } }
 
-.container{
-  position:relative;
-  z-index:5;
-  width:95%;
-  max-width:750px;
-  text-align:center;
-}
+/* layout */
+.container{ position:relative; z-index:6; width:100%; max-width:980px; display:grid; grid-template-columns: 1fr 340px; gap:28px; align-items:start; }
+@media(max-width:920px){ .container{ grid-template-columns:1fr; padding:0 14px } }
 
-h1{
-  color:var(--accent);
-  font-size:36px;
-  margin-bottom:6px;
-}
-.subtitle{
-  opacity:0.7;
-  margin-bottom:20px;
-}
+.panel{ background:var(--card); border-radius:14px; padding:22px; border:1px solid var(--glass); box-shadow: 0 12px 30px rgba(15,12,20,0.06); }
 
-.wheel-box{
-  position:relative;
-  width:100%;
-  max-width:420px;
-  margin:0 auto;
-}
+.header{ display:flex; gap:18px; align-items:flex-start; }
+.title{ color:var(--accent); font-weight:800; font-size:26px; margin:0 0 6px 0; }
+.lead{ margin:0; color:var(--muted); font-weight:300; }
 
-svg{
-  width:100%;
-  transition:transform 1.4s cubic-bezier(.2,.9,.2,1);
-}
+/* wheel area */
+.wheel-col{ display:flex; flex-direction:column; align-items:center; gap:12px; padding-top:8px; }
+.wheel-box{ width:100%; max-width:460px; aspect-ratio:1/1; position:relative; margin:6px auto; }
+svg#wheel{ width:98%; height:98%; border-radius:50%; transition: transform 1.2s cubic-bezier(.2,.9,.2,1); display:block; box-shadow: 0 14px 36px rgba(11,9,10,0.06); }
+.pointer{ position:absolute; top:4%; left:50%; transform:translateX(-50%); z-index:40; }
+.pointer::after{ content:""; display:block; width:0;height:0; border-left:16px solid transparent; border-right:16px solid transparent; border-bottom:28px solid var(--accent); filter:drop-shadow(0 6px 14px var(--pointer-shadow)); border-radius:2px; }
 
-.pointer{
-  position:absolute;
-  top:0;
-  left:50%;
-  transform:translateX(-50%);
-  width:0;height:0;
-  border-left:16px solid transparent;
-  border-right:16px solid transparent;
-  border-bottom:26px solid var(--accent);
-}
+/* spin button */
+.spin{ margin-top:12px; padding:12px 26px; border-radius:999px; font-weight:800; font-size:16px; border:none; color:white; background:linear-gradient(90deg,var(--accent),var(--accent-2)); cursor:pointer; box-shadow: 0 10px 26px rgba(255,77,141,0.12); }
+.spin:active{ transform:translateY(2px) }
 
-button{
-  margin-top:22px;
-  padding:14px 30px;
-  border:none;
-  border-radius:999px;
-  background:linear-gradient(90deg,var(--accent),var(--accent2));
-  color:white;
-  font-weight:800;
-  font-size:16px;
-  cursor:pointer;
-}
+/* prize chips (right column) */
+.prizes{ display:flex; flex-wrap:wrap; gap:10px; margin-top:8px; }
+.chip{ background:var(--chip-bg); color:var(--chip-text); padding:8px 12px; border-radius:999px; font-weight:700; font-size:13px; border:1px solid var(--chip-border); display:inline-flex; gap:8px; align-items:center; box-shadow: 0 6px 18px rgba(11,9,10,0.03); }
 
-/* Glowing banner */
-.banner{
-  position:fixed;
-  bottom:20px;
-  left:50%;
-  transform:translateX(-50%);
-  font-weight:800;
-  font-size:18px;
-  color:var(--accent);
-  animation:glow 2.5s infinite;
-}
-@keyframes glow{
-  0%{ text-shadow:0 0 8px rgba(255,77,141,0.3); }
-  50%{ text-shadow:0 0 25px rgba(255,77,141,0.8); }
-  100%{ text-shadow:0 0 8px rgba(255,77,141,0.3); }
-}
+/* details */
+.details h3{ margin:0 0 8px 0; color:var(--accent); font-size:18px; }
+.details p{ margin:0 0 12px 0; color:var(--muted); font-weight:300; }
 
-/* Modal */
-.modal{
-  position:fixed;
-  inset:0;
-  background:rgba(0,0,0,0.7);
-  display:none;
-  align-items:center;
-  justify-content:center;
-  z-index:10;
-}
-.modal-content{
-  background:#1b203d;
-  padding:26px;
-  border-radius:12px;
-  text-align:center;
-  max-width:90%;
-}
-.modal h2{
-  color:var(--accent);
-}
-.modal button{
-  margin-top:18px;
-}
+/* glow banner */
+.glow{ position:fixed; left:50%; transform:translateX(-50%); bottom:18px; padding:10px 18px; border-radius:999px; background:linear-gradient(90deg, rgba(255,255,255,0.9), rgba(255,255,255,0.95)); color:var(--accent); z-index:12; font-weight:800; box-shadow:0 10px 36px rgba(255,77,141,0.06); }
 
-/* Confetti canvas */
-#confetti{
-  position:fixed;
-  inset:0;
-  pointer-events:none;
-  z-index:20;
-}
+/* modal */
+.modal{ position:fixed; inset:0; background: rgba(11,12,16,0.05); display:none; align-items:center; justify-content:center; z-index:20; }
+.modal-card{ position:relative; z-index:22; background: linear-gradient(180deg,#fff,#fff); padding:20px; border-radius:12px; border:1px solid rgba(0,0,0,0.04); max-width:92%; box-shadow:0 18px 46px rgba(11,9,10,0.06); text-align:center }
+.modal-card h2{ margin:0 0 8px 0; color:var(--accent) }
+.modal-card p{ margin:0 0 12px 0; color:var(--muted) }
+
+/* confetti canvas */
+#confetti{ position:fixed; inset:0; pointer-events:none; z-index:40; }
+
+/* small helpers */
+.note{ margin-top:14px; font-size:13px; color:var(--muted) }
+.center{ text-align:center }
 </style>
 </head>
 <body>
 
+<!-- soft falling hearts background -->
 <div class="hearts" id="hearts"></div>
 
 <div class="container">
-  <h1>Will You?</h1>
-  <div class="subtitle">Spin the wheel and see your surprise 💫</div>
+  <!-- left panel: wheel -->
+  <div class="panel">
+    <div class="header">
+      <div>
+        <h2 class="title">Spin the Love Wheel</h2>
+        <p class="lead">Spin the wheel and watch the magic. No matter where it stops… love finds a way. 💖</p>
+      </div>
+    </div>
 
-  <div class="wheel-box">
-    <div class="pointer"></div>
-    <svg id="wheel" viewBox="0 0 400 400"></svg>
+    <div class="wheel-col">
+      <div class="wheel-box" aria-hidden="false">
+        <div class="pointer" aria-hidden="true"></div>
+        <svg id="wheel" viewBox="0 0 400 400" role="img" aria-label="Wheel"></svg>
+      </div>
+
+      <button class="spin" id="spinBtn">🎡 Spin the Wheel</button>
+      <div class="note center">Tip: open on mobile for the best cuddle experience 💌</div>
+    </div>
   </div>
 
-  <button id="spinBtn">SPIN IT! 🎡</button>
+  <!-- right panel: prizes & details -->
+  <div class="panel details">
+    <h3>Prizes</h3>
+    <div class="prizes" id="chips"></div>
+
+    <h3 style="margin-top:16px">How it works</h3>
+    <p>This wheel will spin, land, and then softly rotate to the <strong>“Be my Valentine”</strong> slice for the big reveal. Click the final button to accept your prize (and my heart).</p>
+
+    <h3 style="margin-top:16px">Personalize</h3>
+    <p>Edit <code>YOUR_NAME</code> and <code>HEROINE_NAME</code> variables inside the script to personalize messages.</p>
+  </div>
 </div>
 
-<div class="banner">Louie loves Hulky ❤️</div>
+<!-- glowing banner -->
+<div class="glow">Louie loves Hulky ❤️</div>
 
+<!-- modal -->
 <div class="modal" id="modal">
-  <div class="modal-content">
-    <h2>Hulky ❤️</h2>
-    <p>Will you be my Valentine? — Louie</p>
-    <button id="confirmBtn">Always 💘</button>
+  <div class="modal-card" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+    <h2 id="modalTitle">Hulky ❤️</h2>
+    <p id="modalText">Dear Hulky, will you be my Valentine? — Louie</p>
+    <button id="confirmBtn" style="padding:10px 16px;border-radius:10px;border:none;background:linear-gradient(90deg,var(--accent),var(--accent-2));color:#fff;font-weight:800;cursor:pointer">Always 💘</button>
   </div>
 </div>
 
 <canvas id="confetti"></canvas>
 
 <script>
+/* ====== personalization ====== */
+const YOUR_NAME = "Louie";
+const HEROINE_NAME = "Hulky";
+
+/* ====== wheel data & colors ====== */
 const slices = [
-  {label:"Kiss 😘"},
-  {label:"Hug 🤗"},
-  {label:"Chocolate 🍫"},
-  {label:"Movie 🎬"},
-  {label:"Flowers 🌹"},
-  {label:"Pizza 🍕"},
-  {label:"Surprise 🎁"},
-  {label:"Be my Valentine 💘", target:true}
+  { label: "Kiss", emoji: "😘" },
+  { label: "Hug", emoji: "🤗" },
+  { label: "Chocolate", emoji: "🍫" },
+  { label: "Surprise", emoji: "🎁" },
+  { label: "Date Night", emoji: "🌃" },
+  { label: "Flowers", emoji: "🌹" },
+  { label: "Movie", emoji: "🎬" },
+  { label: "Be my Valentine", emoji: "💘", target:true }
 ];
 
-const colors=["#ffe4ec","#ffd1e3","#fff0f6","#ffdbe9","#ffeef6","#ffd6e7","#fff7fb","#ffc2d9"];
+const colors = ["#fff0f6","#ffe6ef","#fff6f9","#ffeef6","#fff3f8","#fff7fb","#fff8fb","#ffd1e3"];
 
-const svg=document.getElementById("wheel");
-const spinBtn=document.getElementById("spinBtn");
-let rotation=0;
-let spinning=false;
+/* DOM nodes */
+const svg = document.getElementById('wheel');
+const chipsWrap = document.getElementById('chips');
+const spinBtn = document.getElementById('spinBtn');
+const modal = document.getElementById('modal');
+const modalText = document.getElementById('modalText');
+const confirmBtn = document.getElementById('confirmBtn');
+const confettiCanvas = document.getElementById('confetti');
 
+let rotation = 0;
+let spinning = false;
+
+/* draw wheel with labeled upright text */
 function drawWheel(){
-  const cx=200,cy=200,r=190;
-  const total=slices.length;
-  const arc=360/total;
-  let start=-90;
-
+  svg.innerHTML = '';
+  const cx = 200, cy = 200, r = 190;
+  const total = slices.length;
+  const arc = 360 / total;
+  let start = -90;
   for(let i=0;i<total;i++){
-    const end=start+arc;
-    const x1=cx+r*Math.cos(start*Math.PI/180);
-    const y1=cy+r*Math.sin(start*Math.PI/180);
-    const x2=cx+r*Math.cos(end*Math.PI/180);
-    const y2=cy+r*Math.sin(end*Math.PI/180);
+    const end = start + arc;
+    const x1 = cx + r*Math.cos(start*Math.PI/180);
+    const y1 = cy + r*Math.sin(start*Math.PI/180);
+    const x2 = cx + r*Math.cos(end*Math.PI/180);
+    const y2 = cy + r*Math.sin(end*Math.PI/180);
 
-    const path=document.createElementNS("http://www.w3.org/2000/svg","path");
-    const d=`M ${cx} ${cy} L ${x1} ${y1} A ${r} ${r} 0 0 1 ${x2} ${y2} Z`;
-    path.setAttribute("d",d);
-    path.setAttribute("fill",colors[i]);
+    const path = document.createElementNS('http://www.w3.org/2000/svg','path');
+    const d = `M ${cx} ${cy} L ${x1} ${y1} A ${r} ${r} 0 0 1 ${x2} ${y2} Z`;
+    path.setAttribute('d', d);
+    path.setAttribute('fill', colors[i % colors.length]);
+    path.setAttribute('stroke', 'rgba(0,0,0,0.03)');
     svg.appendChild(path);
 
-    start=end;
+    // label placement
+    const mid = (start + end)/2;
+    const theta = mid * Math.PI/180;
+    const labelRadius = r * 0.62;
+    const lx = cx + labelRadius * Math.cos(theta);
+    const ly = cy + labelRadius * Math.sin(theta);
+    const g = document.createElementNS('http://www.w3.org/2000/svg','g');
+    g.setAttribute('transform', `translate(${lx},${ly}) rotate(${mid+90})`);
+
+    const text = document.createElementNS('http://www.w3.org/2000/svg','text');
+    text.setAttribute('x', 0);
+    text.setAttribute('y', 0);
+    text.setAttribute('text-anchor', 'middle');
+    text.setAttribute('dominant-baseline','central');
+    text.setAttribute('font-size', 14);
+    text.setAttribute('font-weight', 700);
+    text.setAttribute('fill', '#2b2b2f');
+    text.style.fontFamily = '"Poppins", system-ui, sans-serif';
+    text.textContent = `${slices[i].emoji} ${slices[i].label}`;
+
+    // flip bottom half to keep upright
+    const adjust = (mid+90) % 360;
+    if(adjust > 90 && adjust < 270){
+      g.setAttribute('transform', `translate(${lx},${ly}) rotate(${mid+90}) scale(1,-1)`);
+    }
+    g.appendChild(text);
+    svg.appendChild(g);
+
+    start = end;
+  }
+
+  // center hub
+  const circle = document.createElementNS('http://www.w3.org/2000/svg','circle');
+  circle.setAttribute('cx',cx);
+  circle.setAttribute('cy',cy);
+  circle.setAttribute('r',46);
+  circle.setAttribute('fill','#fff');
+  circle.setAttribute('stroke','rgba(0,0,0,0.04)');
+  svg.appendChild(circle);
+
+  const heart = document.createElementNS('http://www.w3.org/2000/svg','text');
+  heart.setAttribute('x',cx);
+  heart.setAttribute('y',cy+6);
+  heart.setAttribute('text-anchor','middle');
+  heart.setAttribute('font-size',26);
+  heart.setAttribute('font-weight',800);
+  heart.setAttribute('fill', '#ff4d8d');
+  heart.style.fontFamily = '"Poppins", system-ui, sans-serif';
+  heart.textContent = '💘';
+  svg.appendChild(heart);
+}
+
+/* fill right side chips */
+function fillChips(){
+  chipsWrap.innerHTML = '';
+  for(const s of slices){
+    const el = document.createElement('div');
+    el.className = 'chip';
+    el.textContent = `${s.emoji} ${s.label}`;
+    // give "Be my Valentine" a slightly stronger accent
+    if(s.target) {
+      el.style.background = 'linear-gradient(90deg,#ffd6e7,#ffb8d3)';
+      el.style.border = '1px solid rgba(255,77,141,0.14)';
+      el.style.color = '#2b2b2f';
+    }
+    chipsWrap.appendChild(el);
   }
 }
-drawWheel();
 
-spinBtn.onclick=function(){
+/* small interaction sound (optional, soft beep) */
+function beep(freq=540,len=0.05){
+  try{
+    const ctx = new (window.AudioContext||window.webkitAudioContext)();
+    const o = ctx.createOscillator(); const g = ctx.createGain();
+    o.type='sine'; o.frequency.value=freq; g.gain.value=0.02;
+    o.connect(g); g.connect(ctx.destination); o.start();
+    setTimeout(()=>{ o.stop(); ctx.close(); }, len*1000);
+  }catch(e){}
+}
+
+/* spin: fake randomness then snap to target */
+function spin(){
   if(spinning) return;
-  spinning=true;
-  const total=slices.length;
-  const arc=360/total;
-  const targetIndex=slices.findIndex(s=>s.target);
-  const spins=6;
-  const targetAngle=(targetIndex+0.5)*arc;
-  rotation+=spins*360+(360-targetAngle);
-  svg.style.transform=`rotate(${rotation}deg)`;
-  setTimeout(()=>{
-    document.getElementById("modal").style.display="flex";
-    spinning=false;
-  },2000);
-};
+  spinning = true;
+  spinBtn.disabled = true;
+  beep(760,0.06);
 
-const confirmBtn=document.getElementById("confirmBtn");
-confirmBtn.onclick=function(){
-  heartExplosion();
-  confirmBtn.innerText="Thank you ❤️";
-  setTimeout(()=>{
-    document.getElementById("modal").style.display="none";
-  },1500);
-};
+  const total = slices.length;
+  const arc = 360 / total;
+  const targetIndex = slices.findIndex(s=>s.target);
+  const baseSpins = 6 + Math.floor(Math.random()*3);
+  const fakeIndex = Math.floor(Math.random()*total);
+  const fakeAngle = (fakeIndex + Math.random()*0.6 - 0.3)*arc;
+  const targetAngle = (targetIndex + 0.5)*arc;
 
-/* Heart explosion */
-const canvas=document.getElementById("confetti");
-const ctx=canvas.getContext("2d");
-canvas.width=window.innerWidth;
-canvas.height=window.innerHeight;
-window.onresize=()=>{canvas.width=window.innerWidth;canvas.height=window.innerHeight;}
+  const from = rotation % 360;
+  const initialTo = from + baseSpins*360 + (360 - fakeAngle);
+  const finalTo = from + (baseSpins+2)*360 + (360 - targetAngle);
 
-let particles=[];
-function heartExplosion(){
-  for(let i=0;i<40;i++){
-    particles.push({
-      x:canvas.width/2,
-      y:canvas.height/2,
-      vx:(Math.random()-0.5)*10,
-      vy:(Math.random()-0.5)*10,
-      size:20+Math.random()*10
+  animateRotation(from, initialTo, 1300, 'cubic', ()=>{
+    setTimeout(()=>{
+      beep(440,0.05);
+      animateRotation(initialTo, finalTo, 1500, 'easeOut', ()=>{
+        rotation = finalTo % 360;
+        spinning = false;
+        spinBtn.disabled = false;
+        openModal();
+      });
+    }, 300);
+  });
+}
+
+function animateRotation(from, to, duration, easing='linear', cb){
+  const start = performance.now();
+  const diff = to - from;
+  const easeFns = {
+    linear: t=>t,
+    cubic: t=>--t*t*t+1,
+    easeOut: t=>1-Math.pow(1-t,3)
+  };
+  const ease = easeFns[easing] || easeFns.linear;
+  function frame(now){
+    const t = Math.min(1, (now - start)/duration);
+    const v = ease(t);
+    const val = from + diff*v;
+    svg.style.transform = `rotate(${val}deg)`;
+    if(t < 1) requestAnimationFrame(frame);
+    else { if(cb) cb(); }
+  }
+  requestAnimationFrame(frame);
+}
+
+/* modal reveal & confetti */
+function openModal(){
+  modal.style.display = 'flex';
+  modalText.textContent = `Dear ${HEROINE_NAME}, I promise more hugs, silly dances and warm socks. Will you be my Valentine? — ${YOUR_NAME}`;
+  playConfetti(90);
+}
+
+/* confetti + heart burst (canvas) */
+const canvas = confettiCanvas;
+const ctx = canvas.getContext('2d');
+let pieces = [];
+function resize(){ canvas.width = innerWidth; canvas.height = innerHeight; }
+window.addEventListener('resize', resize); resize();
+
+function rand(min,max){ return Math.random()*(max-min)+min; }
+function makeConfetti(n=100){
+  const cols = ['#ff6b9a','#ffdce6','#ff9fb8','#fff0f6','#ffc6de'];
+  for(let i=0;i<n;i++){
+    pieces.push({
+      x: rand(0,canvas.width),
+      y: -rand(0,canvas.height),
+      vx: rand(-2.4,2.4),
+      vy: rand(2,6),
+      size: rand(6,12),
+      rot: rand(0,360),
+      vr: rand(-6,6),
+      color: cols[Math.floor(rand(0,cols.length))]
     });
   }
-  animate();
+  if(!running) update();
 }
-
-function animate(){
+function makeHeartBurst(n=36){
+  for(let i=0;i<n;i++){
+    pieces.push({
+      x: canvas.width/2 + rand(-60,60),
+      y: canvas.height/2 + rand(-30,30),
+      vx: rand(-6,6),
+      vy: rand(-6,2),
+      size: rand(18,34),
+      rot: rand(0,360),
+      vr: rand(-9,9),
+      color: "#ff4d8d",
+      heart:true
+    });
+  }
+  if(!running) update();
+}
+let running=false;
+function update(){
+  running=true;
   ctx.clearRect(0,0,canvas.width,canvas.height);
-  particles.forEach((p,i)=>{
-    p.x+=p.vx;
-    p.y+=p.vy;
-    p.vy+=0.2;
-    ctx.font=p.size+"px serif";
-    ctx.fillText("❤️",p.x,p.y);
-    if(p.y>canvas.height) particles.splice(i,1);
-  });
-  if(particles.length>0) requestAnimationFrame(animate);
+  for(let i=0;i<pieces.length;i++){
+    const p = pieces[i];
+    p.x += p.vx; p.y += p.vy; p.rot += p.vr; p.vy += 0.08;
+    ctx.save(); ctx.translate(p.x,p.y); ctx.rotate(p.rot*Math.PI/180);
+    if(p.heart){
+      ctx.font = `${p.size}px serif`; ctx.fillStyle = p.color; ctx.fillText("❤", -p.size/2, p.size/2);
+    } else {
+      ctx.fillStyle = p.color; ctx.fillRect(-p.size/2, -p.size/2, p.size, p.size*0.6);
+    }
+    ctx.restore();
+    if(p.y > canvas.height + 80){ pieces.splice(i,1); i--; }
+  }
+  if(pieces.length > 0) requestAnimationFrame(update); else running=false;
 }
+function playConfetti(n=120){ makeConfetti(n); }
 
-/* falling hearts background */
-const heartContainer=document.getElementById("hearts");
-const emojis=["❤️","💕","💖"];
-for(let i=0;i<30;i++){
-  const span=document.createElement("span");
-  span.className="heart";
-  span.innerText=emojis[Math.floor(Math.random()*emojis.length)];
-  span.style.left=Math.random()*100+"vw";
-  span.style.animationDuration=5+Math.random()*5+"s";
-  span.style.fontSize=12+Math.random()*22+"px";
-  heartContainer.appendChild(span);
+/* confirm button behavior (Always) */
+confirmBtn.addEventListener('click', ()=>{
+  confirmBtn.disabled = true;
+  confirmBtn.innerText = 'Thank you ❤️';
+  // heart burst + extra confetti
+  makeHeartBurst(44);
+  playConfetti(220);
+  setTimeout(()=>{ modal.style.display = 'none'; }, 1400);
+});
+
+/* fill chips & draw wheel */
+drawWheel();
+fillChips();
+
+/* hook up spin button and keyboard */
+spinBtn.addEventListener('click', spin);
+window.addEventListener('keydown', e=>{ if(e.key === ' ' || e.key === 'Enter'){ e.preventDefault(); if(!spinning) spin(); } });
+
+/* subtle UI hearts in background */
+const heartContainer = document.getElementById('hearts');
+const heartEmojis = ["❤️","💕","💖","💘"];
+for(let i=0;i<28;i++){
+  const s = document.createElement('span');
+  s.className = 'heart';
+  s.textContent = heartEmojis[Math.floor(Math.random()*heartEmojis.length)];
+  s.style.left = (Math.random()*100) + 'vw';
+  s.style.animationDuration = (4 + Math.random()*6) + 's';
+  s.style.fontSize = (10 + Math.random()*22) + 'px';
+  s.style.top = (-10 - Math.random()*30) + 'vh';
+  heartContainer.appendChild(s);
 }
 </script>
 </body>
