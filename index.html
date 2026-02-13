@@ -1,0 +1,383 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>For My Valentine ❤️</title>
+    <link href="https://fonts.googleapis.com/css2?family=Pacifico&family=Quicksand:wght@400;600;700&display=swap" rel="stylesheet">
+    
+    <style>
+        /* THEME CONFIG 
+           Just changing colors here if I need to.
+        */
+        :root {
+            --dark-bg: #1a1a2e;
+            --card-bg: #16213e;
+            --pink: #e94560;
+            --soft-pink: #ffadad;
+            --text: #f0f0f0;
+        }
+
+        body {
+            margin: 0;
+            background-color: var(--dark-bg);
+            color: var(--text);
+            font-family: 'Quicksand', sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            overflow-x: hidden; /* safety for confetti */
+        }
+
+        .main-wrapper {
+            width: 100%;
+            max-width: 500px;
+            padding: 20px;
+            text-align: center;
+        }
+
+        h1 {
+            font-family: 'Pacifico', cursive;
+            color: var(--pink);
+            font-size: 2.5rem;
+            margin-bottom: 0.5rem;
+            text-shadow: 0 4px 10px rgba(233, 69, 96, 0.3);
+        }
+
+        p.subtitle {
+            color: #bdc3c7;
+            margin-top: 0;
+            margin-bottom: 30px;
+        }
+
+        /* THE WHEEL SETUP */
+        .wheel-container {
+            position: relative;
+            width: 320px;
+            height: 320px;
+            margin: 0 auto 30px;
+        }
+
+        .pointer {
+            position: absolute;
+            top: -15px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 40px;
+            height: 40px;
+            background: var(--pink);
+            clip-path: polygon(50% 100%, 0 0, 100% 0);
+            z-index: 10;
+            filter: drop-shadow(0 4px 4px rgba(0,0,0,0.3));
+        }
+
+        .wheel {
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            border: 8px solid white;
+            box-shadow: 0 0 20px rgba(0,0,0,0.5);
+            transition: transform 4s cubic-bezier(0.17, 0.67, 0.12, 0.99); /* ease-out-quart ish */
+            overflow: hidden;
+            position: relative;
+            background: #fff;
+        }
+
+        .segment {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 50%;
+            height: 50%;
+            transform-origin: 100% 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            /* clip-path calculated in JS now because CSS math is annoying */
+        }
+
+        .segment span {
+            position: absolute;
+            left: 30px; /* push text out */
+            top: 45px;
+            transform-origin: 0 0;
+            font-weight: bold;
+            font-size: 1.1rem;
+            color: #333;
+            width: 120px;
+            text-align: left;
+        }
+
+        #spin-btn {
+            background: linear-gradient(45deg, var(--pink), #ff2e63);
+            border: none;
+            padding: 15px 40px;
+            border-radius: 50px;
+            color: white;
+            font-size: 1.2rem;
+            font-weight: bold;
+            cursor: pointer;
+            box-shadow: 0 10px 25px rgba(233, 69, 96, 0.4);
+            transition: transform 0.2s;
+            font-family: 'Quicksand', sans-serif;
+        }
+
+        #spin-btn:active {
+            transform: scale(0.95);
+        }
+        
+        #spin-btn:disabled {
+            background: #555;
+            cursor: not-allowed;
+            box-shadow: none;
+        }
+
+        /* MODAL POPUP */
+        .modal-overlay {
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0,0,0,0.85);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 100;
+            backdrop-filter: blur(5px);
+        }
+
+        .modal-content {
+            background: white;
+            padding: 40px;
+            border-radius: 20px;
+            max-width: 90%;
+            width: 400px;
+            text-align: center;
+            color: #333;
+            animation: popIn 0.5s ease;
+        }
+
+        @keyframes popIn {
+            0% { transform: scale(0.8); opacity: 0; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+
+        .modal-content h2 {
+            font-family: 'Pacifico', cursive;
+            color: var(--pink);
+            font-size: 2rem;
+            margin: 0 0 10px;
+        }
+        
+        .yes-btn {
+            background: var(--pink);
+            color: white;
+            border: none;
+            padding: 10px 30px;
+            border-radius: 8px;
+            font-size: 1.1rem;
+            cursor: pointer;
+            margin-top: 20px;
+        }
+
+        /* Mobile tweaks */
+        @media (max-width: 400px) {
+            .wheel-container { width: 280px; height: 280px; }
+            h1 { font-size: 2rem; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="main-wrapper">
+        <h1>Will You?</h1>
+        <p class="subtitle">Spin the wheel to see what you win! <br>(No cheating I swear 😉)</p>
+
+        <div class="wheel-container">
+            <div class="pointer"></div>
+            <div class="wheel" id="wheel">
+                </div>
+        </div>
+
+        <button id="spin-btn">SPIN IT! 🎡</button>
+        
+        <p style="margin-top: 30px; font-size: 0.8rem; opacity: 0.5;">
+            Made with ☕ and ❤️ by [YOUR_NAME]
+        </p>
+    </div>
+
+    <div class="modal-overlay" id="modal">
+        <div class="modal-content">
+            <h2>You got it!</h2>
+            <p id="result-text">...</p>
+            <p style="font-size: 0.9rem; color: #666; margin-top:5px">
+                (I knew you'd land on this one)
+            </p>
+            <button class="yes-btn" onclick="closeModal()">Accept Prize 💖</button>
+        </div>
+    </div>
+
+    <canvas id="confetti" style="position:fixed; top:0; left:0; pointer-events:none; z-index:99;"></canvas>
+
+    <script>
+        // --- CONFIGURATION ---
+        // Change these to customize!
+        const MY_NAME = "Bob"; 
+        const PARTNER_NAME = "Alice"; 
+        
+        // The last item is the one we force it to land on ;)
+        // Don't tell her the math is rigged.
+        const prizes = [
+            { text: "Free Hug 🤗", color: "#ffd1dc" },
+            { text: "Coffee Date ☕", color: "#ffecf0" },
+            { text: "Foot Massage 🦶", color: "#ffd1dc" },
+            { text: "Dinner on Me 🍕", color: "#ffecf0" },
+            { text: "Movie Night 🎬", color: "#ffd1dc" },
+            { text: "Chocolate 🍫", color: "#ffecf0" },
+            { text: "Be My Valentine? 💘", color: "#ff99ac", isTarget: true } 
+        ];
+
+        const wheel = document.getElementById('wheel');
+        const btn = document.getElementById('spin-btn');
+        const modal = document.getElementById('modal');
+        const resultText = document.getElementById('result-text');
+
+        let currentRotation = 0;
+        
+        // Build the wheel dynamically so I don't have to do SVG math manually
+        function initWheel() {
+            const segmentAngle = 360 / prizes.length;
+            
+            prizes.forEach((prize, index) => {
+                const div = document.createElement('div');
+                div.className = 'segment';
+                // CSS Skew hack to make pie slices
+                const rotate = index * segmentAngle;
+                const skew = 90 - segmentAngle; 
+                
+                // This styling is a bit messy but it works to shape the slices
+                div.style.backgroundColor = prize.color;
+                div.style.transform = `rotate(${rotate}deg) skewY(-${skew}deg)`;
+                
+                // Un-skew the text so it's readable
+                const text = document.createElement('span');
+                text.textContent = prize.text;
+                text.style.transform = `skewY(${skew}deg) rotate(${segmentAngle/2}deg)`;
+                
+                div.appendChild(text);
+                wheel.appendChild(div);
+            });
+        }
+
+        // The logic to spin
+        btn.addEventListener('click', () => {
+            console.log("Spinning..."); // Debugging
+            
+            // Disable button so we don't double click
+            btn.disabled = true;
+            btn.innerText = "Spinning...";
+
+            // Find the index of the "Target" (Valentine)
+            // If you want fair play, change .find() to random, but why risk it? lol
+            const winningIndex = prizes.findIndex(p => p.isTarget);
+            
+            // Math time:
+            // 1. Calculate how many degrees per segment
+            const sliceDeg = 360 / prizes.length;
+            
+            // 2. We want to land on the winner.
+            // The pointer is at the TOP (0 deg or 360). 
+            // To bring the winning slice to the top, we need to rotate the wheel
+            // so that the specific slice aligns with 0.
+            // Add a little randomness (-10 to 10) so it doesn't hit the exact center every time.
+            const offset = Math.floor(Math.random() * (sliceDeg - 10)) + 5; 
+            const stopAngle = (winningIndex * sliceDeg) + offset;
+
+            // 3. Add a bunch of full spins (5 to 10) for drama
+            const spins = 360 * 8; 
+            
+            // Calculate total rotation needed
+            // We subtract stopAngle because we are rotating clockwise
+            const totalDegrees = spins + (360 - stopAngle);
+            
+            // Apply CSS
+            wheel.style.transform = `rotate(${totalDegrees}deg)`;
+            
+            // Wait for animation to finish (4 seconds matched to CSS)
+            setTimeout(() => {
+                showModal(prizes[winningIndex].text);
+                fireConfetti();
+                btn.innerText = "Enjoy! ❤️";
+            }, 4000);
+        });
+
+        function showModal(text) {
+            resultText.innerHTML = `Will you... <br><strong style="font-size:1.5rem; color:#e94560">${text}</strong>`;
+            modal.style.display = 'flex';
+        }
+
+        function closeModal() {
+            // Just refresh or hide, let's just hide
+            modal.style.display = 'none';
+            alert("Yay! It's a date! ❤️");
+        }
+
+        // --- CONFETTI STUFF ---
+        // I grabbed this simplified version from a tutorial, it's lightweight
+        const canvas = document.getElementById('confetti');
+        const ctx = canvas.getContext('2d');
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+
+        let pieces = [];
+        
+        function fireConfetti() {
+            // make a bunch of squares
+            for(let i=0; i<100; i++) {
+                pieces.push({
+                    x: window.innerWidth / 2,
+                    y: window.innerHeight / 2, // explode from center
+                    w: Math.random() * 10 + 5,
+                    h: Math.random() * 10 + 5,
+                    vx: (Math.random() - 0.5) * 20, // velocity x
+                    vy: (Math.random() - 0.5) * 20, // velocity y
+                    color: `hsl(${Math.random() * 360}, 100%, 50%)`,
+                    gravity: 0.1
+                });
+            }
+            requestAnimationFrame(updateConfetti);
+        }
+
+        function updateConfetti() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            
+            pieces.forEach((p, index) => {
+                p.x += p.vx;
+                p.y += p.vy;
+                p.vy += p.gravity; // fall down
+                
+                ctx.fillStyle = p.color;
+                ctx.fillRect(p.x, p.y, p.w, p.h);
+                
+                // remove if off screen
+                if(p.y > canvas.height) {
+                    pieces.splice(index, 1);
+                }
+            });
+
+            if(pieces.length > 0) {
+                requestAnimationFrame(updateConfetti);
+            }
+        }
+
+        // Initialize on load
+        initWheel();
+
+        // Handle resize for canvas
+        window.addEventListener('resize', () => {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        });
+
+    </script>
+</body>
+</html>
