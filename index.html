@@ -7,12 +7,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;600;800&display=swap" rel="stylesheet">
 <style>
 :root{
-  --bg1:#0b1020;
-  --bg2:#151a33;
-  --accent:#ff4d8d;
-  --accent-2:#ff96b8;
-  --muted:#bfc4d0;
-  --slice-text:#2b2b2f;
+  --bg1:#0b1020; --bg2:#151a33; --accent:#ff4d8d; --accent2:#ff96b8; --muted:#bfc4d0; --slice-text:#2b2b2f;
 }
 *{box-sizing:border-box}
 html,body{height:100%; margin:0}
@@ -20,29 +15,27 @@ body{
   background: linear-gradient(180deg,var(--bg1),var(--bg2));
   color:var(--muted);
   font-family:"Poppins",system-ui,-apple-system,Segoe UI,Roboto,Arial;
-  display:flex; align-items:center; justify-content:center; padding:22px;
-  -webkit-font-smoothing:antialiased;
-  overflow:hidden;
+  display:flex; align-items:center; justify-content:center; padding:20px; overflow:hidden;
 }
 
-/* Falling hearts (subtle) */
+/* falling hearts */
 .hearts{ position:fixed; inset:0; pointer-events:none; z-index:0; }
 .heart{ position:absolute; opacity:0.22; animation: fall linear infinite; transform-origin:center; }
 @keyframes fall{ from{ transform:translateY(-10vh) rotate(0deg)} to{ transform:translateY(110vh) rotate(360deg)} }
 
-/* main layout */
-.container{ width:100%; max-width:900px; text-align:center; position:relative; z-index:3; }
-.title{ color:var(--accent); font-size:40px; margin:8px 0 6px 0; font-weight:800; }
+/* layout */
+.container{ width:100%; max-width:920px; text-align:center; position:relative; z-index:3; }
+.title{ color:var(--accent); font-size:40px; margin:6px 0 4px 0; font-weight:800; }
 .subtitle{ color:var(--muted); margin:0 0 18px 0; font-weight:300; }
 
-/* wheel box */
+/* wheel */
 .wheel-box{ width:100%; max-width:540px; margin:0 auto; position:relative; }
-svg#wheel{ width:98%; height:auto; display:block; border-radius:50%; transition:transform 1.2s cubic-bezier(.2,.9,.2,1); filter: drop-shadow(0 18px 40px rgba(2,6,23,0.6)); }
+svg#wheel{ width:98%; height:auto; display:block; border-radius:50%; filter: drop-shadow(0 18px 40px rgba(2,6,23,0.6)); }
 .pointer{ position:absolute; top:2%; left:50%; transform:translateX(-50%); z-index:40; pointer-events:none; }
 .pointer::after{ content:""; display:block; width:0;height:0; border-left:18px solid transparent; border-right:18px solid transparent; border-bottom:32px solid var(--accent); filter: drop-shadow(0 6px 14px rgba(0,0,0,0.35)); border-radius:2px; }
 
 /* button */
-.spin{ margin:20px auto 6px auto; padding:14px 30px; border-radius:999px; background:linear-gradient(90deg,var(--accent),var(--accent-2)); color:white; border:none; font-weight:800; font-size:16px; cursor:pointer; box-shadow:0 10px 30px rgba(255,77,141,0.12); }
+.spin{ margin:18px auto 6px auto; padding:14px 30px; border-radius:999px; background:linear-gradient(90deg,var(--accent),var(--accent2)); color:white; border:none; font-weight:800; font-size:16px; cursor:pointer; box-shadow:0 10px 30px rgba(255,77,141,0.12); }
 
 /* banner */
 .banner{ color:var(--accent); font-weight:800; margin-top:8px; text-shadow:0 6px 20px rgba(255,77,141,0.08); }
@@ -52,27 +45,24 @@ svg#wheel{ width:98%; height:auto; display:block; border-radius:50%; transition:
 .modal-bg{ position:absolute; inset:0; background:linear-gradient(180deg, rgba(3,6,12,0.6), rgba(3,6,12,0.7)); }
 .card{ position:relative; z-index:42; background: linear-gradient(180deg,#071026,#0b1220); padding:22px; border-radius:12px; border:1px solid rgba(255,255,255,0.03); color:var(--muted); text-align:center; width:min(92%,520px); }
 .card h2{ color:var(--accent); margin:0 0 8px 0; }
-.card p{ margin:0 0 14px 0; }
-.btn-row{ display:flex; gap:12px; justify-content:center; margin-top:8px; flex-wrap:wrap; }
+.btn-row{ display:flex; gap:12px; justify-content:center; margin-top:12px; flex-wrap:wrap; }
 .btn { padding:10px 14px; border-radius:10px; font-weight:800; cursor:pointer; border:none; }
 .btn.ghost{ background:transparent; color:var(--muted); border:1px solid rgba(255,255,255,0.06); }
-.btn.accept{ background:linear-gradient(90deg,var(--accent),var(--accent-2)); color:white; }
+.btn.accept{ background:linear-gradient(90deg,var(--accent),var(--accent2)); color:white; }
 
 /* final full-screen message */
-#finalScreen{
-  position:fixed; inset:0; display:none; align-items:center; justify-content:center; z-index:60; background:linear-gradient(180deg, rgba(11,14,28,0.92), rgba(3,6,12,0.95));
-  flex-direction:column; gap:18px;
-}
-#finalScreen h1{ color:#ff3b5c; font-size:64px; margin:0; text-align:center; font-weight:900; text-shadow: 0 12px 32px rgba(255,59,92,0.12); }
+#finalScreen{ position:fixed; inset:0; display:none; align-items:center; justify-content:center; z-index:60; background:linear-gradient(180deg, rgba(11,14,28,0.92), rgba(3,6,12,0.95)); flex-direction:column; gap:18px; }
+#finalScreen h1{ color:#ff3b5c; font-size:64px; margin:0; font-weight:900; text-shadow: 0 12px 32px rgba(255,59,92,0.12); }
 #finalScreen p{ color: #ffdfe8; font-size:20px; margin:0; }
 
 /* confetti canvas */
 #confetti{ position:fixed; inset:0; pointer-events:none; z-index:46; }
 
-/* responsive */
+/* small screen */
 @media(max-width:720px){
-  .title{ font-size:34px } .pointer::after{ border-left:14px solid transparent; border-right:14px solid transparent; border-bottom:24px solid var(--accent); }
+  .title{ font-size:34px }
   #finalScreen h1{ font-size:44px }
+  .pointer::after{ border-left:14px solid transparent; border-right:14px solid transparent; border-bottom:24px solid var(--accent); }
 }
 </style>
 </head>
@@ -86,14 +76,24 @@ svg#wheel{ width:98%; height:auto; display:block; border-radius:50%; transition:
 
   <div class="wheel-box" id="wheelBox">
     <div class="pointer" aria-hidden="true"></div>
-    <svg id="wheel" viewBox="0 0 400 400" role="img" aria-label="Prize wheel"></svg>
+    <!-- SVG layout:
+         - <g id="rotor"> contains slice paths + center hub and is rotated to spin
+         - labels are separate <text> elements (not children of rotor)
+           — we update their x/y every animation frame so they move with rotor but remain horizontal
+    -->
+    <svg id="wheel" viewBox="0 0 400 400" role="img" aria-label="Prize wheel" xmlns="http://www.w3.org/2000/svg">
+      <defs></defs>
+      <g id="rotor"></g>
+      <!-- labels group (text elements appended here) -->
+      <g id="labels"></g>
+    </svg>
   </div>
 
   <button id="spinBtn" class="spin">SPIN IT! 🎡</button>
   <div class="banner">Louie loves Hulky ❤️</div>
 </div>
 
-<!-- modal (two options) -->
+<!-- modal -->
 <div class="modal" id="modal">
   <div class="modal-bg" onclick="nudge()"></div>
   <div class="card" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
@@ -106,8 +106,8 @@ svg#wheel{ width:98%; height:auto; display:block; border-radius:50%; transition:
   </div>
 </div>
 
-<!-- final fullscreen -->
-<div id="finalScreen" role="region" aria-label="Final message">
+<!-- final -->
+<div id="finalScreen" aria-live="polite">
   <h1 id="finalTitle">Hulky — I love you</h1>
   <p id="finalSub">Forever and always. ❤️</p>
 </div>
@@ -115,9 +115,9 @@ svg#wheel{ width:98%; height:auto; display:block; border-radius:50%; transition:
 <canvas id="confetti"></canvas>
 
 <script>
-/* ------------------------
-   Personalization & data
-   ------------------------ */
+/* =============================
+   PERSONALIZATION + DATA
+   ============================= */
 const YOUR_NAME = "Louie";
 const HEROINE_NAME = "Hulky";
 
@@ -132,212 +132,234 @@ const slices = [
   { label: "Be my Valentine", emoji: "💘", target:true }
 ];
 
-const colors = ["#ffdce6","#fff0f6","#ffdfe9","#fff7fb","#ffeef6","#fff3f8","#fff6fb","#ffcfe0"];
+const sliceColors = ["#ffdce6","#fff0f6","#ffdfe9","#fff7fb","#ffeef6","#fff3f8","#fff6fb","#ffcfe0"];
 
-/* ------------------------
-   DOM refs
-   ------------------------ */
+/* =============================
+   DOM REFS
+   ============================= */
 const svg = document.getElementById('wheel');
+const rotor = document.getElementById('rotor');
+const labelsGroup = document.getElementById('labels');
 const spinBtn = document.getElementById('spinBtn');
 const modal = document.getElementById('modal');
 const tryAgainBtn = document.getElementById('tryAgainBtn');
 const alwaysBtn = document.getElementById('alwaysBtn');
 const finalScreen = document.getElementById('finalScreen');
 const confettiCanvas = document.getElementById('confetti');
-const wheelBox = document.getElementById('wheelBox');
-const mainUI = document.getElementById('mainUI');
 const modalText = document.getElementById('modalText');
 
-let rotation = 0;
+let rotation = 0;           // current rotor rotation in degrees
 let spinning = false;
-let confirmed = false; // prevents duplicate final triggers
+let confirmed = false;
 
-/* ------------------------
-   Draw wheel (labels always horizontal)
-   ------------------------ */
-function drawWheel(){
-  svg.innerHTML = '';
-  const cx = 200, cy = 200, r = 190;
-  const total = slices.length;
-  const arc = 360/total;
+/* geometry */
+const CX = 200, CY = 200, R = 190;
+const TOTAL = slices.length;
+const ARC = 360 / TOTAL;
+const LABEL_RADIUS = R * 0.62;
+
+/* store label elements and their base mid angles so we can update them */
+const labelNodes = []; // { el: SVGTextElement, midAngle }
+
+/* =============================
+   DRAW SLICES and LABELS (initial)
+   rotor contains geometry that will be rotated via transform
+   labels are separate horizontal <text> elements that we reposition each frame
+   ============================= */
+function buildWheel(){
+  rotor.innerHTML = '';
+  labelsGroup.innerHTML = '';
+  labelNodes.length = 0;
+
   let start = -90;
-
-  for(let i=0;i<total;i++){
-    const end = start + arc;
-    const x1 = cx + r*Math.cos(start*Math.PI/180);
-    const y1 = cy + r*Math.sin(start*Math.PI/180);
-    const x2 = cx + r*Math.cos(end*Math.PI/180);
-    const y2 = cy + r*Math.sin(end*Math.PI/180);
+  for(let i=0;i<TOTAL;i++){
+    const end = start + ARC;
 
     // slice path
+    const x1 = CX + R * Math.cos(start * Math.PI/180);
+    const y1 = CY + R * Math.sin(start * Math.PI/180);
+    const x2 = CX + R * Math.cos(end * Math.PI/180);
+    const y2 = CY + R * Math.sin(end * Math.PI/180);
+
     const path = document.createElementNS('http://www.w3.org/2000/svg','path');
-    const d = `M ${cx} ${cy} L ${x1} ${y1} A ${r} ${r} 0 0 1 ${x2} ${y2} Z`;
+    const d = `M ${CX} ${CY} L ${x1} ${y1} A ${R} ${R} 0 0 1 ${x2} ${y2} Z`;
     path.setAttribute('d', d);
-    path.setAttribute('fill', colors[i % colors.length]);
+    path.setAttribute('fill', sliceColors[i % sliceColors.length]);
     path.setAttribute('stroke', 'rgba(0,0,0,0.03)');
-    svg.appendChild(path);
+    rotor.appendChild(path);
 
-    // label coordinates but keep text horizontal
-    const mid = (start + end)/2;
-    const theta = mid * Math.PI/180;
-    const labelR = r * 0.62;
-    const lx = cx + labelR * Math.cos(theta);
-    const ly = cy + labelR * Math.sin(theta);
-
+    // compute mid angle for label (slice center)
+    const mid = (start + end) / 2; // degrees relative to top (-90 start)
+    // create horizontal text in labelsGroup (we'll position by x/y later)
     const text = document.createElementNS('http://www.w3.org/2000/svg','text');
-    text.setAttribute('x', lx);
-    text.setAttribute('y', ly + 4);
-    text.setAttribute('text-anchor', 'middle');
-    text.setAttribute('dominant-baseline', 'middle');
-    text.setAttribute('font-size', 13);
+    text.setAttribute('font-size', 14);
     text.setAttribute('font-weight', 700);
     text.setAttribute('fill', 'var(--slice-text)');
     text.style.fontFamily = '"Poppins", system-ui, sans-serif';
+    text.setAttribute('text-anchor', 'middle');
+    text.setAttribute('dominant-baseline', 'middle');
     text.textContent = `${slices[i].emoji} ${slices[i].label}`;
-    svg.appendChild(text);
+    labelsGroup.appendChild(text);
+
+    labelNodes.push({ el: text, midAngle: mid });
 
     start = end;
   }
 
-  // center hub
+  // center hub inside rotor
   const circle = document.createElementNS('http://www.w3.org/2000/svg','circle');
-  circle.setAttribute('cx',cx);
-  circle.setAttribute('cy',cy);
-  circle.setAttribute('r',46);
-  circle.setAttribute('fill','#fff7fb');
-  circle.setAttribute('stroke','rgba(0,0,0,0.04)');
-  svg.appendChild(circle);
+  circle.setAttribute('cx', CX);
+  circle.setAttribute('cy', CY);
+  circle.setAttribute('r', 46);
+  circle.setAttribute('fill', '#fff7fb');
+  circle.setAttribute('stroke', 'rgba(0,0,0,0.04)');
+  rotor.appendChild(circle);
 
   const heart = document.createElementNS('http://www.w3.org/2000/svg','text');
-  heart.setAttribute('x',cx);
-  heart.setAttribute('y',cy+6);
-  heart.setAttribute('text-anchor','middle');
-  heart.setAttribute('font-size',26);
-  heart.setAttribute('font-weight',800);
+  heart.setAttribute('x', CX);
+  heart.setAttribute('y', CY + 6);
+  heart.setAttribute('text-anchor', 'middle');
+  heart.setAttribute('font-size', 26);
+  heart.setAttribute('font-weight', 800);
   heart.setAttribute('fill', 'var(--accent)');
   heart.style.fontFamily = '"Poppins", system-ui, sans-serif';
   heart.textContent = '💘';
-  svg.appendChild(heart);
+  rotor.appendChild(heart);
+
+  // initial label placement
+  updateLabelPositions(rotation);
 }
 
-/* ------------------------
-   Smooth spin: fake random then smoothly snap to target
-   ------------------------ */
-function beep(freq=560,len=0.05){
+/* update label positions so they move around with rotor but remain horizontal */
+function updateLabelPositions(currentRotationDeg){
+  for(const ln of labelNodes){
+    const angle = ln.midAngle + currentRotationDeg; // degrees
+    const rad = angle * Math.PI/180;
+    const x = CX + LABEL_RADIUS * Math.cos(rad);
+    const y = CY + LABEL_RADIUS * Math.sin(rad);
+    ln.el.setAttribute('x', x);
+    ln.el.setAttribute('y', y + 3); // small vertical tweak
+  }
+}
+
+/* =============================
+   Smooth spin animation that updates rotor transform and label positions
+   ============================= */
+function animateRotation(from, to, duration=1200, easing='easeOut') {
+  return new Promise(resolve=>{
+    const start = performance.now();
+    const diff = to - from;
+    const easeFns = {
+      linear: t => t,
+      cubic: t => --t*t*t+1,
+      easeOut: t => 1 - Math.pow(1 - t, 3)
+    };
+    const ease = easeFns[easing] || easeFns.easeOut;
+    function frame(now){
+      const t = Math.min(1, (now - start) / duration);
+      const val = from + diff * ease(t);
+      rotor.setAttribute('transform', `rotate(${val} ${CX} ${CY})`);
+      updateLabelPositions(val);
+      if(t < 1) requestAnimationFrame(frame);
+      else { resolve(val); }
+    }
+    requestAnimationFrame(frame);
+  });
+}
+
+/* small beep for feedback */
+function beep(freq=560, len=0.05){
   try{
-    const ctx = new (window.AudioContext||window.webkitAudioContext)();
+    const ctx = new (window.AudioContext || window.webkitAudioContext)();
     const o = ctx.createOscillator();
     const g = ctx.createGain();
     o.type='sine'; o.frequency.value=freq; g.gain.value=0.02;
-    o.connect(g); g.connect(ctx.destination);
-    o.start(); setTimeout(()=>{ o.stop(); ctx.close(); }, len*1000);
+    o.connect(g); g.connect(ctx.destination); o.start();
+    setTimeout(()=>{ o.stop(); ctx.close(); }, len*1000);
   }catch(e){}
 }
 
-function spin(){
+/* spin logic: first "fake" random short spin, then smooth snap to target */
+async function spin(){
   if(spinning || confirmed) return;
   spinning = true;
   spinBtn.disabled = true;
   beep(760,0.06);
 
-  const total = slices.length;
-  const arc = 360/total;
-  const target = slices.findIndex(s=>s.target);
-  const base = 6 + Math.floor(Math.random()*2); // 6-7 spins
-  const fakeIdx = Math.floor(Math.random()*total);
-  const fakeAngle = (fakeIdx + Math.random()*0.6 - 0.3) * arc;
-  const targetAngle = (target + 0.5) * arc;
+  const targetIndex = slices.findIndex(s=>s.target);
+  const baseSpins = 6 + Math.floor(Math.random()*2); // 6-7 spins
+  const fakeIndex = Math.floor(Math.random()*TOTAL);
+  const fakeAngle = (fakeIndex + (Math.random()*0.6 - 0.3)) * ARC;
+  const targetAngle = (targetIndex + 0.5) * ARC;
 
   const from = rotation % 360;
-  const firstTo = from + base*360 + (360 - fakeAngle);
-  const finalTo = from + (base+2)*360 + (360 - targetAngle);
+  const firstTo = from + baseSpins * 360 + (360 - fakeAngle);
+  const finalTo = from + (baseSpins + 2) * 360 + (360 - targetAngle);
 
-  animateRotation(from, firstTo, 1000, 'cubic', ()=>{
-    setTimeout(()=>{
-      beep(420,0.05);
-      animateRotation(firstTo, finalTo, 1400, 'easeOut', ()=>{
-        rotation = finalTo % 360;
-        spinning = false;
-        spinBtn.disabled = false;
-        openModal();
-      });
-    }, 200);
-  });
+  // fast-ish fake spin (gives randomness feel)
+  rotation = await animateRotation(from, firstTo, 900, 'cubic');
+  // pause then gentle snap to final
+  await new Promise(r=>setTimeout(r, 200));
+  rotation = await animateRotation(rotation, finalTo, 1400, 'easeOut');
+
+  // normalize
+  rotation = rotation % 360;
+  spinning = false;
+  spinBtn.disabled = false;
+
+  // open modal
+  openModal();
 }
 
-/* easing animation loop */
-function animateRotation(from, to, duration, easing='linear', cb){
-  const start = performance.now();
-  const diff = to - from;
-  const eases = {
-    linear: t=>t,
-    cubic: t=>--t*t*t+1,
-    easeOut: t=>1-Math.pow(1-t,3)
-  };
-  const ease = eases[easing] || eases.linear;
-  function frame(now){
-    const t = Math.min(1, (now - start)/duration);
-    const v = ease(t);
-    const val = from + diff*v;
-    svg.style.transform = `rotate(${val}deg)`;
-    if(t < 1) requestAnimationFrame(frame);
-    else { if(cb) cb(); }
-  }
-  requestAnimationFrame(frame);
-}
-
-/* ------------------------
-   Modal behavior
-   ------------------------ */
+/* =============================
+   Modal behavior (try again / always)
+   ============================= */
 function openModal(){
-  modal.style.display = 'flex';
   modalText.textContent = `Dear ${HEROINE_NAME}, will you be my Valentine? — ${YOUR_NAME}`;
-  playConfetti(60); // gentle intro
+  modal.style.display = 'flex';
+  playConfetti(60);
 }
 
-/* "Didn't like it — try again" -> just close modal and allow spin again */
 tryAgainBtn.addEventListener('click', ()=>{
   modal.style.display = 'none';
 });
 
-/* "Always" -> final flow: heart burst, hide wheel+button, show final screen (no extra modal) */
 alwaysBtn.addEventListener('click', ()=>{
   if(confirmed) return;
   confirmed = true;
   modal.style.display = 'none';
 
   // heart burst + confetti
-  makeHeartBurst(40);
-  playConfetti(180);
+  makeHeartBurst(44);
+  playConfetti(220);
 
-  // hide wheel controls after short delay for smoother feel
+  // hide wheel/controls and show final
   setTimeout(()=>{
-    // hide main UI but keep confetti running
-    mainUI.style.display = 'none';
+    document.getElementById('mainUI').style.display = 'none';
     finalScreen.style.display = 'flex';
-  }, 600);
+  }, 500);
 });
 
-/* nudge on backdrop click */
 function nudge(){ beep(260,0.04); }
 
-/* ------------------------
-   Confetti + heartburst code
-   ------------------------ */
+/* =============================
+   Confetti + heart burst (canvas)
+   ============================= */
 const canvas = confettiCanvas;
 const ctx = canvas.getContext('2d');
 let parts = [];
-function resize(){ canvas.width = innerWidth; canvas.height = innerHeight; }
-window.addEventListener('resize', resize); resize();
+function resizeCanvas(){ canvas.width = innerWidth; canvas.height = innerHeight; }
+window.addEventListener('resize', resizeCanvas); resizeCanvas();
 
 function rand(min,max){ return Math.random()*(max-min)+min; }
+
 function makeConfetti(n=100){
   const cols = ['#ff6b9a','#ffdce6','#ff9fb8','#fff0f6','#ffc6de'];
   for(let i=0;i<n;i++){
     parts.push({
       x: rand(0,canvas.width),
       y: -rand(0,canvas.height),
-      vx: rand(-2.4,2.4),
+      vx: rand(-2.5,2.5),
       vy: rand(2,6),
       size: rand(6,12),
       rot: rand(0,360),
@@ -345,9 +367,10 @@ function makeConfetti(n=100){
       color: cols[Math.floor(rand(0,cols.length))]
     });
   }
-  if(!running) updateConfetti();
+  if(!confRunning) updateConfetti();
 }
-function makeHeartBurst(n=40){
+
+function makeHeartBurst(n=36){
   for(let i=0;i<n;i++){
     parts.push({
       x: canvas.width/2 + rand(-60,60),
@@ -361,35 +384,40 @@ function makeHeartBurst(n=40){
       heart:true
     });
   }
-  if(!running) updateConfetti();
+  if(!confRunning) updateConfetti();
 }
-let running = false;
+
+let confRunning = false;
 function updateConfetti(){
-  running = true;
+  confRunning = true;
   ctx.clearRect(0,0,canvas.width,canvas.height);
   for(let i=0;i<parts.length;i++){
     const p = parts[i];
     p.x += p.vx; p.y += p.vy; p.rot += p.vr; p.vy += 0.08;
     ctx.save(); ctx.translate(p.x,p.y); ctx.rotate(p.rot*Math.PI/180);
     if(p.heart){
-      ctx.font = `${p.size}px serif`; ctx.fillStyle = p.color; ctx.fillText("❤", -p.size/2, p.size/2);
+      ctx.font = `${p.size}px serif`;
+      ctx.fillStyle = p.color;
+      ctx.fillText("❤", -p.size/2, p.size/2);
     } else {
-      ctx.fillStyle = p.color; ctx.fillRect(-p.size/2, -p.size/2, p.size, p.size*0.6);
+      ctx.fillStyle = p.color;
+      ctx.fillRect(-p.size/2, -p.size/2, p.size, p.size*0.6);
     }
     ctx.restore();
     if(p.y > canvas.height + 80){ parts.splice(i,1); i--; }
   }
-  if(parts.length>0) requestAnimationFrame(updateConfetti);
-  else running = false;
+  if(parts.length > 0) requestAnimationFrame(updateConfetti);
+  else confRunning = false;
 }
+
 function playConfetti(n=120){ makeConfetti(n); }
 
-/* ------------------------
-   Falling hearts in the background (decor)
-   ------------------------ */
+/* =============================
+   Background small hearts (decor)
+   ============================= */
 const heartContainer = document.getElementById('hearts');
 const heartEmojis = ["❤️","💕","💖"];
-for(let i=0;i<26;i++){
+for(let i=0;i<28;i++){
   const s = document.createElement('span');
   s.className = 'heart';
   s.textContent = heartEmojis[Math.floor(Math.random()*heartEmojis.length)];
@@ -400,15 +428,13 @@ for(let i=0;i<26;i++){
   heartContainer.appendChild(s);
 }
 
-/* ------------------------
-   Initial drawing and wiring
-   ------------------------ */
-drawWheel();
+/* =============================
+   Init wiring
+   ============================= */
+buildWheel();
 spinBtn.addEventListener('click', spin);
-
-// keyboard accessibility
 window.addEventListener('keydown', e => {
-  if(e.key === ' ' || e.key === 'Enter'){ e.preventDefault(); if(!spinning && !confirmed) spin(); }
+  if((e.key === ' ' || e.key === 'Enter') && !spinning && !confirmed){ e.preventDefault(); spin(); }
 });
 </script>
 </body>
