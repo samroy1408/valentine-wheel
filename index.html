@@ -12,7 +12,7 @@
   --accent:#ff4d8d;
   --accent-2:#ff96b8;
   --muted:#bfc4d0;
-  --slice-text:#2b2b2f; /* dark text on pink slices */
+  --slice-text:#2b2b2f;
 }
 *{box-sizing:border-box}
 html,body{height:100%; margin:0}
@@ -22,11 +22,12 @@ body{
   font-family:"Poppins",system-ui,-apple-system,Segoe UI,Roboto,Arial;
   display:flex; align-items:center; justify-content:center; padding:22px;
   -webkit-font-smoothing:antialiased;
+  overflow:hidden;
 }
 
 /* Falling hearts (subtle) */
 .hearts{ position:fixed; inset:0; pointer-events:none; z-index:0; }
-.heart{ position:absolute; opacity:0.22; animation: fall linear infinite; }
+.heart{ position:absolute; opacity:0.22; animation: fall linear infinite; transform-origin:center; }
 @keyframes fall{ from{ transform:translateY(-10vh) rotate(0deg)} to{ transform:translateY(110vh) rotate(360deg)} }
 
 /* main layout */
@@ -51,24 +52,39 @@ svg#wheel{ width:98%; height:auto; display:block; border-radius:50%; transition:
 .modal-bg{ position:absolute; inset:0; background:linear-gradient(180deg, rgba(3,6,12,0.6), rgba(3,6,12,0.7)); }
 .card{ position:relative; z-index:42; background: linear-gradient(180deg,#071026,#0b1220); padding:22px; border-radius:12px; border:1px solid rgba(255,255,255,0.03); color:var(--muted); text-align:center; width:min(92%,520px); }
 .card h2{ color:var(--accent); margin:0 0 8px 0; }
-.card button{ margin-top:12px; padding:10px 18px; border-radius:10px; border:none; background:linear-gradient(90deg,var(--accent),var(--accent-2)); color:white; font-weight:800; cursor:pointer; }
+.card p{ margin:0 0 14px 0; }
+.btn-row{ display:flex; gap:12px; justify-content:center; margin-top:8px; flex-wrap:wrap; }
+.btn { padding:10px 14px; border-radius:10px; font-weight:800; cursor:pointer; border:none; }
+.btn.ghost{ background:transparent; color:var(--muted); border:1px solid rgba(255,255,255,0.06); }
+.btn.accept{ background:linear-gradient(90deg,var(--accent),var(--accent-2)); color:white; }
+
+/* final full-screen message */
+#finalScreen{
+  position:fixed; inset:0; display:none; align-items:center; justify-content:center; z-index:60; background:linear-gradient(180deg, rgba(11,14,28,0.92), rgba(3,6,12,0.95));
+  flex-direction:column; gap:18px;
+}
+#finalScreen h1{ color:#ff3b5c; font-size:64px; margin:0; text-align:center; font-weight:900; text-shadow: 0 12px 32px rgba(255,59,92,0.12); }
+#finalScreen p{ color: #ffdfe8; font-size:20px; margin:0; }
 
 /* confetti canvas */
 #confetti{ position:fixed; inset:0; pointer-events:none; z-index:46; }
 
-/* small responsive */
-@media(max-width:620px){ .title{ font-size:34px } .pointer::after{ border-left:14px solid transparent; border-right:14px solid transparent; border-bottom:24px solid var(--accent); } }
+/* responsive */
+@media(max-width:720px){
+  .title{ font-size:34px } .pointer::after{ border-left:14px solid transparent; border-right:14px solid transparent; border-bottom:24px solid var(--accent); }
+  #finalScreen h1{ font-size:44px }
+}
 </style>
 </head>
 <body>
 
 <div class="hearts" id="hearts"></div>
 
-<div class="container">
+<div class="container" id="mainUI">
   <div class="title">Will You?</div>
   <div class="subtitle">Spin the wheel and see your surprise 💫</div>
 
-  <div class="wheel-box">
+  <div class="wheel-box" id="wheelBox">
     <div class="pointer" aria-hidden="true"></div>
     <svg id="wheel" viewBox="0 0 400 400" role="img" aria-label="Prize wheel"></svg>
   </div>
@@ -77,22 +93,31 @@ svg#wheel{ width:98%; height:auto; display:block; border-radius:50%; transition:
   <div class="banner">Louie loves Hulky ❤️</div>
 </div>
 
-<!-- modal -->
+<!-- modal (two options) -->
 <div class="modal" id="modal">
   <div class="modal-bg" onclick="nudge()"></div>
   <div class="card" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
     <h2 id="modalTitle">Hulky ❤️</h2>
     <p id="modalText">Dear Hulky, will you be my Valentine? — Louie</p>
-    <button id="confirmBtn">Always 💘</button>
+    <div class="btn-row">
+      <button class="btn ghost" id="tryAgainBtn">Didn't like it — try again</button>
+      <button class="btn accept" id="alwaysBtn">Always 💘</button>
+    </div>
   </div>
+</div>
+
+<!-- final fullscreen -->
+<div id="finalScreen" role="region" aria-label="Final message">
+  <h1 id="finalTitle">Hulky — I love you</h1>
+  <p id="finalSub">Forever and always. ❤️</p>
 </div>
 
 <canvas id="confetti"></canvas>
 
 <script>
-/* ===========================
-   Data & personalization
-   =========================== */
+/* ------------------------
+   Personalization & data
+   ------------------------ */
 const YOUR_NAME = "Louie";
 const HEROINE_NAME = "Hulky";
 
@@ -109,23 +134,27 @@ const slices = [
 
 const colors = ["#ffdce6","#fff0f6","#ffdfe9","#fff7fb","#ffeef6","#fff3f8","#fff6fb","#ffcfe0"];
 
-/* ===========================
+/* ------------------------
    DOM refs
-   =========================== */
+   ------------------------ */
 const svg = document.getElementById('wheel');
 const spinBtn = document.getElementById('spinBtn');
 const modal = document.getElementById('modal');
-const modalText = document.getElementById('modalText');
-const confirmBtn = document.getElementById('confirmBtn');
+const tryAgainBtn = document.getElementById('tryAgainBtn');
+const alwaysBtn = document.getElementById('alwaysBtn');
+const finalScreen = document.getElementById('finalScreen');
 const confettiCanvas = document.getElementById('confetti');
+const wheelBox = document.getElementById('wheelBox');
+const mainUI = document.getElementById('mainUI');
+const modalText = document.getElementById('modalText');
 
 let rotation = 0;
 let spinning = false;
+let confirmed = false; // prevents duplicate final triggers
 
-/* ===========================
-   Draw wheel + readable labels
-   - draws paths + SVG <text> labels upright
-   =========================== */
+/* ------------------------
+   Draw wheel (labels always horizontal)
+   ------------------------ */
 function drawWheel(){
   svg.innerHTML = '';
   const cx = 200, cy = 200, r = 190;
@@ -148,36 +177,24 @@ function drawWheel(){
     path.setAttribute('stroke', 'rgba(0,0,0,0.03)');
     svg.appendChild(path);
 
-    // label placement (upright)
+    // label coordinates but keep text horizontal
     const mid = (start + end)/2;
     const theta = mid * Math.PI/180;
     const labelR = r * 0.62;
     const lx = cx + labelR * Math.cos(theta);
     const ly = cy + labelR * Math.sin(theta);
 
-    const g = document.createElementNS('http://www.w3.org/2000/svg','g');
-    // rotate group so the text follows radial, then flip if bottom half
-    const rot = mid + 90;
-    if(((rot % 360) > 90) && ((rot % 360) < 270)){
-      // bottom half -> flip vertically so text reads upright
-      g.setAttribute('transform', `translate(${lx},${ly}) rotate(${rot}) scale(1,-1)`);
-    } else {
-      g.setAttribute('transform', `translate(${lx},${ly}) rotate(${rot})`);
-    }
-
     const text = document.createElementNS('http://www.w3.org/2000/svg','text');
-    text.setAttribute('x', 0);
-    text.setAttribute('y', 0);
+    text.setAttribute('x', lx);
+    text.setAttribute('y', ly + 4);
     text.setAttribute('text-anchor', 'middle');
-    text.setAttribute('dominant-baseline', 'central');
-    text.setAttribute('font-size', 14);
+    text.setAttribute('dominant-baseline', 'middle');
+    text.setAttribute('font-size', 13);
     text.setAttribute('font-weight', 700);
     text.setAttribute('fill', 'var(--slice-text)');
     text.style.fontFamily = '"Poppins", system-ui, sans-serif';
-    text.textContent = `${slices[i].emoji}  ${slices[i].label}`;
-
-    g.appendChild(text);
-    svg.appendChild(g);
+    text.textContent = `${slices[i].emoji} ${slices[i].label}`;
+    svg.appendChild(text);
 
     start = end;
   }
@@ -203,9 +220,9 @@ function drawWheel(){
   svg.appendChild(heart);
 }
 
-/* ===========================
-   Spin mechanics — fake random then snap to target slice
-   =========================== */
+/* ------------------------
+   Smooth spin: fake random then smoothly snap to target
+   ------------------------ */
 function beep(freq=560,len=0.05){
   try{
     const ctx = new (window.AudioContext||window.webkitAudioContext)();
@@ -218,7 +235,7 @@ function beep(freq=560,len=0.05){
 }
 
 function spin(){
-  if(spinning) return;
+  if(spinning || confirmed) return;
   spinning = true;
   spinBtn.disabled = true;
   beep(760,0.06);
@@ -226,7 +243,7 @@ function spin(){
   const total = slices.length;
   const arc = 360/total;
   const target = slices.findIndex(s=>s.target);
-  const base = 6 + Math.floor(Math.random()*3);
+  const base = 6 + Math.floor(Math.random()*2); // 6-7 spins
   const fakeIdx = Math.floor(Math.random()*total);
   const fakeAngle = (fakeIdx + Math.random()*0.6 - 0.3) * arc;
   const targetAngle = (target + 0.5) * arc;
@@ -235,19 +252,20 @@ function spin(){
   const firstTo = from + base*360 + (360 - fakeAngle);
   const finalTo = from + (base+2)*360 + (360 - targetAngle);
 
-  animateRotation(from, firstTo, 1100, 'cubic', ()=>{
+  animateRotation(from, firstTo, 1000, 'cubic', ()=>{
     setTimeout(()=>{
-      beep(440,0.05);
-      animateRotation(firstTo, finalTo, 1500, 'easeOut', ()=>{
+      beep(420,0.05);
+      animateRotation(firstTo, finalTo, 1400, 'easeOut', ()=>{
         rotation = finalTo % 360;
         spinning = false;
         spinBtn.disabled = false;
         openModal();
       });
-    }, 300);
+    }, 200);
   });
 }
 
+/* easing animation loop */
 function animateRotation(from, to, duration, easing='linear', cb){
   const start = performance.now();
   const diff = to - from;
@@ -263,21 +281,49 @@ function animateRotation(from, to, duration, easing='linear', cb){
     const val = from + diff*v;
     svg.style.transform = `rotate(${val}deg)`;
     if(t < 1) requestAnimationFrame(frame);
-    else if(cb) cb();
+    else { if(cb) cb(); }
   }
   requestAnimationFrame(frame);
 }
 
-/* ===========================
-   Modal, confetti and heart burst
-   =========================== */
+/* ------------------------
+   Modal behavior
+   ------------------------ */
 function openModal(){
   modal.style.display = 'flex';
-  modalText.textContent = `Dear ${HEROINE_NAME}, I promise more hugs, silly dances and warm socks. Will you be my Valentine? — ${YOUR_NAME}`;
-  playConfetti(90);
+  modalText.textContent = `Dear ${HEROINE_NAME}, will you be my Valentine? — ${YOUR_NAME}`;
+  playConfetti(60); // gentle intro
 }
 
-/* confetti + heart burst on confirm */
+/* "Didn't like it — try again" -> just close modal and allow spin again */
+tryAgainBtn.addEventListener('click', ()=>{
+  modal.style.display = 'none';
+});
+
+/* "Always" -> final flow: heart burst, hide wheel+button, show final screen (no extra modal) */
+alwaysBtn.addEventListener('click', ()=>{
+  if(confirmed) return;
+  confirmed = true;
+  modal.style.display = 'none';
+
+  // heart burst + confetti
+  makeHeartBurst(40);
+  playConfetti(180);
+
+  // hide wheel controls after short delay for smoother feel
+  setTimeout(()=>{
+    // hide main UI but keep confetti running
+    mainUI.style.display = 'none';
+    finalScreen.style.display = 'flex';
+  }, 600);
+});
+
+/* nudge on backdrop click */
+function nudge(){ beep(260,0.04); }
+
+/* ------------------------
+   Confetti + heartburst code
+   ------------------------ */
 const canvas = confettiCanvas;
 const ctx = canvas.getContext('2d');
 let parts = [];
@@ -299,7 +345,7 @@ function makeConfetti(n=100){
       color: cols[Math.floor(rand(0,cols.length))]
     });
   }
-  if(!running) update();
+  if(!running) updateConfetti();
 }
 function makeHeartBurst(n=40){
   for(let i=0;i<n;i++){
@@ -315,10 +361,10 @@ function makeHeartBurst(n=40){
       heart:true
     });
   }
-  if(!running) update();
+  if(!running) updateConfetti();
 }
 let running = false;
-function update(){
+function updateConfetti(){
   running = true;
   ctx.clearRect(0,0,canvas.width,canvas.height);
   for(let i=0;i<parts.length;i++){
@@ -333,29 +379,17 @@ function update(){
     ctx.restore();
     if(p.y > canvas.height + 80){ parts.splice(i,1); i--; }
   }
-  if(parts.length>0) requestAnimationFrame(update);
+  if(parts.length>0) requestAnimationFrame(updateConfetti);
   else running = false;
 }
 function playConfetti(n=120){ makeConfetti(n); }
 
-/* confirm button */
-confirmBtn.addEventListener('click', ()=>{
-  confirmBtn.disabled = true;
-  confirmBtn.innerText = 'Thank you ❤️';
-  makeHeartBurst(44);
-  playConfetti(220);
-  setTimeout(()=>{ modal.style.display = 'none'; }, 1400);
-});
-
-/* small nudge when clicking backdrop */
-function nudge(){ beep(260,0.04); }
-
-/* ===========================
-   Background small hearts
-   =========================== */
+/* ------------------------
+   Falling hearts in the background (decor)
+   ------------------------ */
 const heartContainer = document.getElementById('hearts');
 const heartEmojis = ["❤️","💕","💖"];
-for(let i=0;i<28;i++){
+for(let i=0;i<26;i++){
   const s = document.createElement('span');
   s.className = 'heart';
   s.textContent = heartEmojis[Math.floor(Math.random()*heartEmojis.length)];
@@ -366,13 +400,16 @@ for(let i=0;i<28;i++){
   heartContainer.appendChild(s);
 }
 
-/* ===========================
-   Init
-   =========================== */
+/* ------------------------
+   Initial drawing and wiring
+   ------------------------ */
 drawWheel();
 spinBtn.addEventListener('click', spin);
-window.addEventListener('keydown', e=>{ if(e.key === ' ' || e.key === 'Enter'){ e.preventDefault(); if(!spinning) spin(); } });
 
+// keyboard accessibility
+window.addEventListener('keydown', e => {
+  if(e.key === ' ' || e.key === 'Enter'){ e.preventDefault(); if(!spinning && !confirmed) spin(); }
+});
 </script>
 </body>
 </html>
