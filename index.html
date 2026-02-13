@@ -1,383 +1,504 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>For My Valentine ❤️</title>
-    <link href="https://fonts.googleapis.com/css2?family=Pacifico&family=Quicksand:wght@400;600;700&display=swap" rel="stylesheet">
-    
-    <style>
-        /* THEME CONFIG 
-           Just changing colors here if I need to.
-        */
-        :root {
-            --dark-bg: #1a1a2e;
-            --card-bg: #16213e;
-            --pink: #e94560;
-            --soft-pink: #ffadad;
-            --text: #f0f0f0;
-        }
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Spin the Love Wheel — Will you be my Valentine?</title>
+<style>
+  :root{
+    --bg:#111318;
+    --card:#0f1720;
+    --accent:#ff6b9a;
+    --muted:#9aa6b2;
+    --white:#f8fafc;
+  }
+  *{box-sizing:border-box}
+  html,body{height:100%}
+  body{
+    margin:0;
+    font-family:Inter, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+    background: linear-gradient(180deg, #0b1020 0%, #07101a 100%);
+    color:var(--white);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    padding:20px;
+  }
 
-        body {
-            margin: 0;
-            background-color: var(--dark-bg);
-            color: var(--text);
-            font-family: 'Quicksand', sans-serif;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
-            overflow-x: hidden; /* safety for confetti */
-        }
+  .container{
+    width:100%;
+    max-width:980px;
+    background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
+    border:1px solid rgba(255,255,255,0.03);
+    border-radius:16px;
+    padding:18px;
+    box-shadow: 0 8px 40px rgba(2,6,23,0.7);
+    display:grid;
+    grid-template-columns: 1fr 440px;
+    gap:18px;
+  }
 
-        .main-wrapper {
-            width: 100%;
-            max-width: 500px;
-            padding: 20px;
-            text-align: center;
-        }
+  @media(max-width:880px){
+    .container{grid-template-columns: 1fr; padding:14px}
+  }
 
-        h1 {
-            font-family: 'Pacifico', cursive;
-            color: var(--pink);
-            font-size: 2.5rem;
-            margin-bottom: 0.5rem;
-            text-shadow: 0 4px 10px rgba(233, 69, 96, 0.3);
-        }
+  .left{
+    padding:18px;
+  }
+  h1{
+    margin:0 0 8px 0;
+    font-size:20px;
+    color:var(--accent);
+  }
+  p.lead{color:var(--muted); margin:0 0 16px 0}
 
-        p.subtitle {
-            color: #bdc3c7;
-            margin-top: 0;
-            margin-bottom: 30px;
-        }
+  .wheel-wrap{
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    flex-direction:column;
+  }
+  .wheel-canvas{
+    width:100%;
+    max-width:380px;
+    aspect-ratio:1/1;
+    border-radius:50%;
+    background:conic-gradient(from 0deg, #ffdce6, #fff0f6);
+    display:grid;
+    place-items:center;
+    position:relative;
+    margin:0 auto 18px auto;
+    transform-origin:center;
+    transition:transform 1.2s cubic-bezier(.2,.8,.2,1);
+  }
 
-        /* THE WHEEL SETUP */
-        .wheel-container {
-            position: relative;
-            width: 320px;
-            height: 320px;
-            margin: 0 auto 30px;
-        }
+  .needle{
+    position:absolute;
+    top:6px;
+    left:50%;
+    transform:translateX(-50%);
+    width:0;height:0;
+    border-left:12px solid transparent;
+    border-right:12px solid transparent;
+    border-bottom:24px solid var(--accent);
+    filter:drop-shadow(0 4px 8px rgba(255,107,154,0.25));
+    z-index:40;
+  }
 
-        .pointer {
-            position: absolute;
-            top: -15px;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 40px;
-            height: 40px;
-            background: var(--pink);
-            clip-path: polygon(50% 100%, 0 0, 100% 0);
-            z-index: 10;
-            filter: drop-shadow(0 4px 4px rgba(0,0,0,0.3));
-        }
+  .spin-btn{
+    display:inline-flex;
+    gap:10px;
+    align-items:center;
+    padding:12px 18px;
+    border-radius:999px;
+    border: none;
+    background: linear-gradient(90deg,var(--accent),#ff8fb2);
+    color:white;
+    font-weight:700;
+    font-size:16px;
+    cursor:pointer;
+    box-shadow:0 8px 18px rgba(255,107,154,0.14);
+    transition:transform .12s ease;
+  }
+  .spin-btn:active{transform:translateY(2px)}
 
-        .wheel {
-            width: 100%;
-            height: 100%;
-            border-radius: 50%;
-            border: 8px solid white;
-            box-shadow: 0 0 20px rgba(0,0,0,0.5);
-            transition: transform 4s cubic-bezier(0.17, 0.67, 0.12, 0.99); /* ease-out-quart ish */
-            overflow: hidden;
-            position: relative;
-            background: #fff;
-        }
+  .segments{
+    position:absolute;
+    inset:0;
+    border-radius:50%;
+    display:grid;
+    place-items:center;
+    pointer-events:none;
+  }
 
-        .segment {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 50%;
-            height: 50%;
-            transform-origin: 100% 100%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            /* clip-path calculated in JS now because CSS math is annoying */
-        }
+  .seg-label{
+    position:absolute;
+    width:40%;
+    left:50%;
+    transform-origin:left center;
+    text-align:left;
+    font-weight:700;
+    color:#0a0a0b;
+    text-shadow: 0 1px 0 rgba(255,255,255,0.3);
+    pointer-events:none;
+    font-size:14px;
+  }
 
-        .segment span {
-            position: absolute;
-            left: 30px; /* push text out */
-            top: 45px;
-            transform-origin: 0 0;
-            font-weight: bold;
-            font-size: 1.1rem;
-            color: #333;
-            width: 120px;
-            text-align: left;
-        }
+  .right{
+    padding:18px;
+    border-left:1px solid rgba(255,255,255,0.02);
+  }
+  @media(max-width:880px){ .right{border-left:none; border-top:1px solid rgba(255,255,255,0.02); padding-top:14px} }
 
-        #spin-btn {
-            background: linear-gradient(45deg, var(--pink), #ff2e63);
-            border: none;
-            padding: 15px 40px;
-            border-radius: 50px;
-            color: white;
-            font-size: 1.2rem;
-            font-weight: bold;
-            cursor: pointer;
-            box-shadow: 0 10px 25px rgba(233, 69, 96, 0.4);
-            transition: transform 0.2s;
-            font-family: 'Quicksand', sans-serif;
-        }
+  .history{
+    display:flex;
+    gap:8px;
+    margin-top:12px;
+    flex-wrap:wrap;
+  }
+  .chip{
+    background:rgba(255,255,255,0.03);
+    padding:8px 10px;
+    border-radius:999px;
+    color:var(--muted);
+    font-size:13px;
+  }
 
-        #spin-btn:active {
-            transform: scale(0.95);
-        }
-        
-        #spin-btn:disabled {
-            background: #555;
-            cursor: not-allowed;
-            box-shadow: none;
-        }
+  footer.note{
+    margin-top:18px;
+    color:var(--muted);
+    font-size:13px;
+  }
 
-        /* MODAL POPUP */
-        .modal-overlay {
-            position: fixed;
-            top: 0; left: 0; right: 0; bottom: 0;
-            background: rgba(0,0,0,0.85);
-            display: none;
-            justify-content: center;
-            align-items: center;
-            z-index: 100;
-            backdrop-filter: blur(5px);
-        }
+  /* Modal */
+  .modal-backdrop{
+    position:fixed;
+    inset:0;
+    background:rgba(3,6,12,0.6);
+    display:none;
+    align-items:center;
+    justify-content:center;
+    z-index:600;
+  }
+  .modal{
+    background:linear-gradient(180deg, #0b1220, #071026);
+    border-radius:14px;
+    padding:22px;
+    width: min(92%,540px);
+    border:1px solid rgba(255,255,255,0.04);
+    text-align:center;
+  }
+  .modal h2{margin:0 0 8px 0; color:var(--accent)}
+  .modal p{color:var(--muted); margin:0 0 18px 0}
+  .modal .confirm{
+    padding:10px 18px; border-radius:10px; border:none;
+    background:linear-gradient(90deg,var(--accent),#ff8fb2); color:white; font-weight:700; cursor:pointer;
+  }
 
-        .modal-content {
-            background: white;
-            padding: 40px;
-            border-radius: 20px;
-            max-width: 90%;
-            width: 400px;
-            text-align: center;
-            color: #333;
-            animation: popIn 0.5s ease;
-        }
+  /* Confetti canvas sits above everything */
+  #confettiCanvas{
+    position:fixed; inset:0; pointer-events:none; z-index:900;
+  }
 
-        @keyframes popIn {
-            0% { transform: scale(0.8); opacity: 0; }
-            100% { transform: scale(1); opacity: 1; }
-        }
-
-        .modal-content h2 {
-            font-family: 'Pacifico', cursive;
-            color: var(--pink);
-            font-size: 2rem;
-            margin: 0 0 10px;
-        }
-        
-        .yes-btn {
-            background: var(--pink);
-            color: white;
-            border: none;
-            padding: 10px 30px;
-            border-radius: 8px;
-            font-size: 1.1rem;
-            cursor: pointer;
-            margin-top: 20px;
-        }
-
-        /* Mobile tweaks */
-        @media (max-width: 400px) {
-            .wheel-container { width: 280px; height: 280px; }
-            h1 { font-size: 2rem; }
-        }
-    </style>
+  /* Little credits */
+  .small{font-size:13px; color:var(--muted); margin-top:10px}
+</style>
 </head>
 <body>
+<div class="container" role="main" aria-labelledby="title">
+  <div class="left">
+    <h1 id="title">Spin the Love Wheel</h1>
+    <p class="lead">Spin the wheel and watch the magic. No matter where it stops... love finds a way. 💖</p>
 
-    <div class="main-wrapper">
-        <h1>Will You?</h1>
-        <p class="subtitle">Spin the wheel to see what you win! <br>(No cheating I swear 😉)</p>
+    <div class="wheel-wrap" aria-hidden="false">
+      <div class="wheel-canvas" id="wheel" role="img" aria-label="Love wheel">
+        <div class="needle" aria-hidden="true"></div>
+        <svg viewBox="0 0 200 200" width="100%" height="100%" style="border-radius:50%; display:block">
+          <!-- The wheel will be drawn by JS into this SVG -->
+        </svg>
+        <div class="segments" id="labels"></div>
+      </div>
 
-        <div class="wheel-container">
-            <div class="pointer"></div>
-            <div class="wheel" id="wheel">
-                </div>
-        </div>
+      <button class="spin-btn" id="spinBtn" aria-pressed="false" aria-label="Spin the wheel">
+        🎡 Spin the Wheel
+      </button>
 
-        <button id="spin-btn">SPIN IT! 🎡</button>
-        
-        <p style="margin-top: 30px; font-size: 0.8rem; opacity: 0.5;">
-            Made with ☕ and ❤️ by [YOUR_NAME]
-        </p>
+      <div class="small">Tip: Open on mobile for the best cuddle experience. 💌</div>
     </div>
 
-    <div class="modal-overlay" id="modal">
-        <div class="modal-content">
-            <h2>You got it!</h2>
-            <p id="result-text">...</p>
-            <p style="font-size: 0.9rem; color: #666; margin-top:5px">
-                (I knew you'd land on this one)
-            </p>
-            <button class="yes-btn" onclick="closeModal()">Accept Prize 💖</button>
-        </div>
+    <footer class="note">Built with love by <strong>YOUR_NAME</strong>. Replace names in the file to personalize.</footer>
+  </div>
+
+  <div class="right">
+    <h3>Prizes</h3>
+    <div class="history" id="prizeList">
+      <!-- chips -->
     </div>
 
-    <canvas id="confetti" style="position:fixed; top:0; left:0; pointer-events:none; z-index:99;"></canvas>
+    <div style="margin-top:18px">
+      <h4>How it works</h4>
+      <p class="small">This wheel will spin, land, and then softly rotate to the <strong>“Be my Valentine”</strong> slice for the big reveal. The modal includes a thank-you and one-click acceptance.</p>
+    </div>
+    <div style="margin-top:18px">
+      <h4>Personalize</h4>
+      <p class="small">Edit <code>YOUR_NAME</code> and <code>HEROINE_NAME</code> variables inside the script to personalize messages.</p>
+    </div>
+  </div>
+</div>
 
-    <script>
-        // --- CONFIGURATION ---
-        // Change these to customize!
-        const MY_NAME = "Bob"; 
-        const PARTNER_NAME = "Alice"; 
-        
-        // The last item is the one we force it to land on ;)
-        // Don't tell her the math is rigged.
-        const prizes = [
-            { text: "Chumu and Hug 🤗", color: "#ffd1dc" },
-            { text: "Chocolate cake ☕", color: "#ffecf0" },
-            { text: "Foot Massage  🦶", color: "#ffd1dc" },
-            { text: "Pizza Date 🍕", color: "#ffecf0" },
-            { text: "Movie Night 🎬", color: "#ffd1dc" },
-            { text: "Chocolate 🍫", color: "#ffecf0" },
-            { text: "Be My Valentine? 💘", color: "#ff99ac", isTarget: true } 
-        ];
+<!-- Modal -->
+<div class="modal-backdrop" id="modal">
+  <div class="modal" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+    <h2 id="modalTitle">Be my Valentine?</h2>
+    <p id="modalBody">I promise more hugs, warm socks, and terrible dad jokes. Will you be my Valentine?</p>
+    <button class="confirm" id="confirmBtn">Always ❤️</button>
+  </div>
+</div>
 
-        const wheel = document.getElementById('wheel');
-        const btn = document.getElementById('spin-btn');
-        const modal = document.getElementById('modal');
-        const resultText = document.getElementById('result-text');
+<!-- Confetti canvas -->
+<canvas id="confettiCanvas"></canvas>
 
-        let currentRotation = 0;
-        
-        // Build the wheel dynamically so I don't have to do SVG math manually
-        function initWheel() {
-            const segmentAngle = 360 / prizes.length;
-            
-            prizes.forEach((prize, index) => {
-                const div = document.createElement('div');
-                div.className = 'segment';
-                // CSS Skew hack to make pie slices
-                const rotate = index * segmentAngle;
-                const skew = 90 - segmentAngle; 
-                
-                // This styling is a bit messy but it works to shape the slices
-                div.style.backgroundColor = prize.color;
-                div.style.transform = `rotate(${rotate}deg) skewY(-${skew}deg)`;
-                
-                // Un-skew the text so it's readable
-                const text = document.createElement('span');
-                text.textContent = prize.text;
-                text.style.transform = `skewY(${skew}deg) rotate(${segmentAngle/2}deg)`;
-                
-                div.appendChild(text);
-                wheel.appendChild(div);
-            });
-        }
+<script>
+/*
+  Spin the Love Wheel
+  - Single file.
+  - Target segment is forced to "Be my Valentine" for the final reveal.
+  - Personalize by editing NAME constants below.
+*/
 
-        // The logic to spin
-        btn.addEventListener('click', () => {
-            console.log("Spinning..."); // Debugging
-            
-            // Disable button so we don't double click
-            btn.disabled = true;
-            btn.innerText = "Spinning...";
+const YOUR_NAME = "YOUR_NAME";      // change me
+const HEROINE_NAME = "HEROINE_NAME"; // change me (your wife)
 
-            // Find the index of the "Target" (Valentine)
-            // If you want fair play, change .find() to random, but why risk it? lol
-            const winningIndex = prizes.findIndex(p => p.isTarget);
-            
-            // Math time:
-            // 1. Calculate how many degrees per segment
-            const sliceDeg = 360 / prizes.length;
-            
-            // 2. We want to land on the winner.
-            // The pointer is at the TOP (0 deg or 360). 
-            // To bring the winning slice to the top, we need to rotate the wheel
-            // so that the specific slice aligns with 0.
-            // Add a little randomness (-10 to 10) so it doesn't hit the exact center every time.
-            const offset = Math.floor(Math.random() * (sliceDeg - 10)) + 5; 
-            const stopAngle = (winningIndex * sliceDeg) + offset;
+const segments = [
+  { label: "Kiss", emoji: "😘" },
+  { label: "Hug", emoji: "🤗" },
+  { label: "Chocolate", emoji: "🍫" },
+  { label: "Surprise", emoji: "🎁" },
+  { label: "Date Night", emoji: "🌃" },
+  { label: "Flowers", emoji: "🌹" },
+  { label: "Movie", emoji: "🎬" },
+  { label: "Be my Valentine", emoji: "💘", target:true }
+];
 
-            // 3. Add a bunch of full spins (5 to 10) for drama
-            const spins = 360 * 8; 
-            
-            // Calculate total rotation needed
-            // We subtract stopAngle because we are rotating clockwise
-            const totalDegrees = spins + (360 - stopAngle);
-            
-            // Apply CSS
-            wheel.style.transform = `rotate(${totalDegrees}deg)`;
-            
-            // Wait for animation to finish (4 seconds matched to CSS)
-            setTimeout(() => {
-                showModal(prizes[winningIndex].text);
-                fireConfetti();
-                btn.innerText = "Enjoy! ❤️";
-            }, 4000);
-        });
+const wheel = document.getElementById('wheel');
+const svg = wheel.querySelector('svg');
+const labelsWrap = document.getElementById('labels');
+const spinBtn = document.getElementById('spinBtn');
+const prizeList = document.getElementById('prizeList');
+const modal = document.getElementById('modal');
+const confirmBtn = document.getElementById('confirmBtn');
+const modalBody = document.getElementById('modalBody');
 
-        function showModal(text) {
-            resultText.innerHTML = `Will you... <br><strong style="font-size:1.5rem; color:#e94560">${text}</strong>`;
-            modal.style.display = 'flex';
-        }
+// build prize chips
+segments.forEach(s=>{
+  const chip = document.createElement('div');
+  chip.className='chip';
+  chip.textContent = `${s.emoji} ${s.label}`;
+  prizeList.appendChild(chip);
+});
 
-        function closeModal() {
-            // Just refresh or hide, let's just hide
-            modal.style.display = 'none';
-            alert("Yay! It's a date! ❤️");
-        }
+// audio setup: tiny click
+function playBeep(freq=520, len=0.06) {
+  try {
+    const ctx = new (window.AudioContext || window.webkitAudioContext)();
+    const o = ctx.createOscillator();
+    const g = ctx.createGain();
+    o.type='sine'; o.frequency.value=freq;
+    g.gain.value=0.06;
+    o.connect(g); g.connect(ctx.destination);
+    o.start();
+    setTimeout(()=>{ o.stop(); ctx.close(); }, len*1000);
+  } catch(e){}
+}
 
-        // --- CONFETTI STUFF ---
-        // I grabbed this simplified version from a tutorial, it's lightweight
-        const canvas = document.getElementById('confetti');
-        const ctx = canvas.getContext('2d');
-        canvas.width = window.innerWidth;
-        canvas.height = window.innerHeight;
+// Draw the wheel (SVG arcs)
+function drawWheel(){
+  const cx = 100, cy = 100, r = 95;
+  const total = segments.length;
+  const arcSize = 360/total;
+  svg.innerHTML = '';
+  let start = -90; // start at top
+  for(let i=0;i<total;i++){
+    const seg = segments[i];
+    const end = start + arcSize;
+    const large = arcSize>180?1:0;
+    const x1 = cx + r*Math.cos(start*Math.PI/180);
+    const y1 = cy + r*Math.sin(start*Math.PI/180);
+    const x2 = cx + r*Math.cos(end*Math.PI/180);
+    const y2 = cy + r*Math.sin(end*Math.PI/180);
+    const color = i%2===0 ? '#ffdce6' : '#fff7fb';
+    const path = document.createElementNS('http://www.w3.org/2000/svg','path');
+    const d = `M ${cx} ${cy} L ${x1} ${y1} A ${r} ${r} 0 ${large} 1 ${x2} ${y2} Z`;
+    path.setAttribute('d', d);
+    path.setAttribute('fill', color);
+    path.setAttribute('stroke', 'rgba(0,0,0,0.06)');
+    svg.appendChild(path);
 
-        let pieces = [];
-        
-        function fireConfetti() {
-            // make a bunch of squares
-            for(let i=0; i<100; i++) {
-                pieces.push({
-                    x: window.innerWidth / 2,
-                    y: window.innerHeight / 2, // explode from center
-                    w: Math.random() * 10 + 5,
-                    h: Math.random() * 10 + 5,
-                    vx: (Math.random() - 0.5) * 20, // velocity x
-                    vy: (Math.random() - 0.5) * 20, // velocity y
-                    color: `hsl(${Math.random() * 360}, 100%, 50%)`,
-                    gravity: 0.1
-                });
-            }
-            requestAnimationFrame(updateConfetti);
-        }
+    // label placement (DOM overlay)
+    const label = document.createElement('div');
+    label.className='seg-label';
+    const midAngle = (start + end)/2;
+    label.style.transform = `translate(-60%, -50%) rotate(${midAngle+90}deg) translateX(60%)`;
+    label.innerHTML = `<span style="display:inline-block; transform: rotate(${-(midAngle+90)}deg)">${seg.emoji} ${seg.label}</span>`;
+    labelsWrap.appendChild(label);
 
-        function updateConfetti() {
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
-            
-            pieces.forEach((p, index) => {
-                p.x += p.vx;
-                p.y += p.vy;
-                p.vy += p.gravity; // fall down
-                
-                ctx.fillStyle = p.color;
-                ctx.fillRect(p.x, p.y, p.w, p.h);
-                
-                // remove if off screen
-                if(p.y > canvas.height) {
-                    pieces.splice(index, 1);
-                }
-            });
+    start = end;
+  }
+}
+drawWheel();
 
-            if(pieces.length > 0) {
-                requestAnimationFrame(updateConfetti);
-            }
-        }
+// spinning mechanics
+let currentRotation = 0;
+let isSpinning = false;
 
-        // Initialize on load
-        initWheel();
+function degToRad(d){ return d*Math.PI/180; }
 
-        // Handle resize for canvas
-        window.addEventListener('resize', () => {
-            canvas.width = window.innerWidth;
-            canvas.height = window.innerHeight;
-        });
+function spinToTarget(){
+  if(isSpinning) return;
+  isSpinning = true;
+  spinBtn.disabled = true;
+  spinBtn.setAttribute('aria-pressed','true');
+  playBeep(720,0.08);
 
-    </script>
+  // pick a "fake" random landing index first to give the illusion
+  const fakeIndex = Math.floor(Math.random()*segments.length);
+  const realTargetIndex = segments.findIndex(s=>s.target);
+  const total = segments.length;
+  const arc = 360/total;
+
+  // compute angles so wheel will first spin "randomly", land near fakeIndex,
+  // then slowly rotate to center on realTargetIndex
+  const baseSpins = 6; // full spins
+  const fakeAngle = (fakeIndex + Math.random()*0.6 - 0.3) * arc; // jitter inside section
+  const targetAngle = (realTargetIndex + 0.5) * arc; // center of target section
+
+  // Convert to rotation degrees (wheel rotates clockwise visually, so subtract)
+  // We want finalRotation such that (finalRotation % 360) = -targetAngle + offset
+  // We'll produce a rotation that first lands near fakeIndex, then additional rotation to target.
+  const initialLandingDeg = baseSpins*360 + (-fakeAngle - 90); // -90 to align top
+  const finalLandingDeg   = baseSpins*360 + 360 + (-targetAngle - 90); // extra spin to feel dramatic
+
+  // animate: first fast spin to initialLanding, then slower to finalLanding
+  animateRotation(currentRotation, currentRotation + initialLandingDeg, 1500, 'cubic', ()=>{
+    // short pause then gentle rotate to final landing
+    setTimeout(()=>{
+      playBeep(440,0.06);
+      animateRotation(currentRotation, currentRotation + finalLandingDeg, 1600, 'easeOut', ()=>{
+        // normalize currentRotation
+        currentRotation = (currentRotation + finalLandingDeg) % 360;
+        isSpinning = false;
+        openReveal();
+      });
+    }, 300);
+  });
+}
+
+// generic rotation animation
+function animateRotation(fromDeg, toDeg, duration=1500, easing='linear', onComplete){
+  const start = performance.now();
+  const diff = toDeg - fromDeg;
+  const easeFns = {
+    linear: t=>t,
+    cubic: t=>--t*t*t+1,
+    easeOut: t=>1-Math.pow(1-t,3)
+  };
+  const ease = easeFns[easing] || easeFns.linear;
+
+  function frame(now){
+    const elapsed = now - start;
+    const t = Math.min(1, elapsed/duration);
+    const val = ease(t);
+    const rot = fromDeg + diff*val;
+    currentRotation = rot;
+    wheel.style.transform = `rotate(${rot}deg)`;
+    if(t<1) requestAnimationFrame(frame);
+    else{
+      if(onComplete) onComplete();
+    }
+  }
+  requestAnimationFrame(frame);
+}
+
+// modal reveal & confetti
+function openReveal(){
+  // personalize modal text
+  modalBody.textContent = `Dear ${HEROINE_NAME}, I promise more hugs, terrible jokes, and all my heart. Will you be my Valentine? — ${YOUR_NAME}`;
+  modal.style.display = 'flex';
+  playConfetti();
+}
+
+// event listeners
+spinBtn.addEventListener('click', spinToTarget);
+confirmBtn.addEventListener('click', ()=>{
+  // transform confirm to thank you
+  confirmBtn.disabled = true;
+  confirmBtn.textContent = 'Thank you ❤️';
+  playBeep(820,0.12);
+  // small flourish of confetti
+  playConfetti(500);
+  // close modal after a heartbeat
+  setTimeout(()=>{ modal.style.display='none'; }, 1800);
+});
+
+// close modal if backdrop clicked (but not the modal itself)
+modal.addEventListener('click', (e)=>{
+  if(e.target === modal) {
+    // ignore — encourage the click on the button
+    // small nudge sound
+    playBeep(260,0.04);
+  }
+});
+
+/* ---------------------------
+   Confetti (lightweight canvas)
+   --------------------------- */
+const confettiCanvas = document.getElementById('confettiCanvas');
+const ctx = confettiCanvas.getContext('2d');
+let confettiPieces = [];
+function resizeCanvas(){ confettiCanvas.width = window.innerWidth; confettiCanvas.height = window.innerHeight; }
+window.addEventListener('resize', resizeCanvas);
+resizeCanvas();
+
+function rand(min,max){ return Math.random()*(max-min)+min; }
+
+function makeConfetti(count=80){
+  const colors = ['#ff6b9a','#ffdce6','#ff9fb8','#ffc6de','#fff0f6'];
+  for(let i=0;i<count;i++){
+    confettiPieces.push({
+      x: rand(0, confettiCanvas.width),
+      y: rand(-confettiCanvas.height, 0),
+      vx: rand(-1.5, 1.5),
+      vy: rand(2, 6),
+      size: rand(6,12),
+      rot: rand(0,360),
+      vr: rand(-6,6),
+      color: colors[Math.floor(rand(0,colors.length))]
+    });
+  }
+}
+
+let confettiRunning = false;
+function updateConfetti(){
+  if(confettiPieces.length===0){ confettiRunning=false; ctx.clearRect(0,0,confettiCanvas.width,confettiCanvas.height); return; }
+  confettiRunning = true;
+  ctx.clearRect(0,0,confettiCanvas.width,confettiCanvas.height);
+  for(let i=0;i<confettiPieces.length;i++){
+    const p = confettiPieces[i];
+    p.x += p.vx;
+    p.y += p.vy;
+    p.rot += p.vr;
+    p.vy += 0.06; // gravity
+    ctx.save();
+    ctx.translate(p.x,p.y);
+    ctx.rotate(p.rot*Math.PI/180);
+    ctx.fillStyle = p.color;
+    ctx.fillRect(-p.size/2, -p.size/2, p.size, p.size*0.6);
+    ctx.restore();
+    // remove off-screen
+    if(p.y > confettiCanvas.height + 50) confettiPieces.splice(i,1), i--;
+  }
+  requestAnimationFrame(updateConfetti);
+}
+
+function playConfetti(amount=120){
+  makeConfetti(amount);
+  if(!confettiRunning) updateConfetti();
+}
+
+/* Accessibility / quick keyboard */
+window.addEventListener('keydown', (e)=>{
+  if(e.key === ' ' || e.key === 'Enter'){ e.preventDefault(); if(!isSpinning) spinToTarget(); }
+});
+
+/* initial globe animation tiny bounce for attractiveness */
+(function initialBounce(){
+  wheel.style.transform = 'rotate(-3deg)';
+  setTimeout(()=>{ wheel.style.transform = 'rotate(0deg)'; }, 600);
+})();
+
+/* small touch improvements */
+spinBtn.addEventListener('touchstart', ()=>playBeep(600,0.04));
+
+</script>
 </body>
 </html>
