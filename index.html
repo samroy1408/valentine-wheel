@@ -3,11 +3,16 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>Will You? — Spin the Love Wheel</title>
+<title>Will You? — Spin the Love Wheel (polished)</title>
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;600;800&display=swap" rel="stylesheet">
 <style>
 :root{
-  --bg1:#0b1020; --bg2:#151a33; --accent:#ff4d8d; --accent2:#ff96b8; --muted:#bfc4d0; --slice-text:#2b2b2f;
+  --bg1:#0b1020; --bg2:#151a33;
+  --accent:#ff4d8d; --accent2:#ff96b8; --muted:#bfc4d0; --slice-text:#2b2b2f;
+  --valentine-red: #ff3b5c;
+  --modal-green-start: #e2ffe8;  /* slightly stronger mint */
+  --modal-green-end:   #cfffe0;
+  --modal-text: #083f2b;
 }
 *{box-sizing:border-box}
 html,body{height:100%; margin:0}
@@ -30,35 +35,60 @@ body{
 
 /* wheel */
 .wheel-box{ width:100%; max-width:540px; margin:0 auto; position:relative; }
-svg#wheel{ width:98%; height:auto; display:block; border-radius:50%; filter: drop-shadow(0 18px 40px rgba(2,6,23,0.6)); }
+svg#wheel{ width:98%; height:auto; display:block; border-radius:50%; filter: drop-shadow(0 18px 40px rgba(2,6,23,0.6)); background: transparent; }
 .pointer{ position:absolute; top:2%; left:50%; transform:translateX(-50%); z-index:40; pointer-events:none; }
 .pointer::after{ content:""; display:block; width:0;height:0; border-left:18px solid transparent; border-right:18px solid transparent; border-bottom:32px solid var(--accent); filter: drop-shadow(0 6px 14px rgba(0,0,0,0.35)); border-radius:2px; }
 
-/* button */
+/* spin button */
 .spin{ margin:18px auto 6px auto; padding:14px 30px; border-radius:999px; background:linear-gradient(90deg,var(--accent),var(--accent2)); color:white; border:none; font-weight:800; font-size:16px; cursor:pointer; box-shadow:0 10px 30px rgba(255,77,141,0.12); }
 
 /* banner */
 .banner{ color:var(--accent); font-weight:800; margin-top:8px; text-shadow:0 6px 20px rgba(255,77,141,0.08); }
 
-/* modal */
+/* modal (light green stronger) */
 .modal{ position:fixed; inset:0; display:none; align-items:center; justify-content:center; z-index:40; }
-.modal-bg{ position:absolute; inset:0; background:linear-gradient(180deg, rgba(3,6,12,0.6), rgba(3,6,12,0.7)); }
-.card{ position:relative; z-index:42; background: linear-gradient(180deg,#071026,#0b1220); padding:22px; border-radius:12px; border:1px solid rgba(255,255,255,0.03); color:var(--muted); text-align:center; width:min(92%,520px); }
-.card h2{ color:var(--accent); margin:0 0 8px 0; }
+.modal-bg{ position:absolute; inset:0; background:linear-gradient(180deg, rgba(3,6,12,0.18), rgba(3,6,12,0.22)); }
+.card{ position:relative; z-index:42; background: linear-gradient(180deg,var(--modal-green-start),var(--modal-green-end)); padding:22px; border-radius:12px; border:1px solid rgba(7,90,62,0.08); color:var(--modal-text); text-align:center; width:min(92%,520px); box-shadow: 0 12px 30px rgba(2,6,8,0.06); }
+.card h2{ color:var(--valentine-red); margin:0 0 8px 0; }
+.card p{ margin:0 0 12px 0; color:var(--modal-text); }
 .btn-row{ display:flex; gap:12px; justify-content:center; margin-top:12px; flex-wrap:wrap; }
 .btn { padding:10px 14px; border-radius:10px; font-weight:800; cursor:pointer; border:none; }
-.btn.ghost{ background:transparent; color:var(--muted); border:1px solid rgba(255,255,255,0.06); }
-.btn.accept{ background:linear-gradient(90deg,var(--accent),var(--accent2)); color:white; }
+.btn.ghost{ background:transparent; color:var(--modal-text); border:1px solid rgba(7,90,62,0.08); }
+.btn.accept{ background:var(--valentine-red); color:white; }
+
+/* highlight animation for selected slice */
+path.highlight {
+  fill: var(--valentine-red) !important;
+  stroke: rgba(0,0,0,0.08);
+  /* allow transform on SVG shapes, and animate scale for subtle pulse */
+  transform-box: fill-box;
+  transform-origin: 200px 200px;
+  animation: slicePulse 1.6s infinite;
+  filter: drop-shadow(0 10px 26px rgba(255,59,92,0.32));
+}
+@keyframes slicePulse{
+  0% { transform: scale(1); }
+  50% { transform: scale(1.025); }
+  100% { transform: scale(1); }
+}
+
+/* highlighted label style (applied via JS) */
+text.highlightLabel {
+  font-size:16px !important;
+  font-weight:900 !important;
+  fill:#ffffff !important;
+  /* add a tiny text shadow via duplicate drop shadow using filter (SVG) is complex; white + bold is enough */
+}
 
 /* final full-screen message */
 #finalScreen{ position:fixed; inset:0; display:none; align-items:center; justify-content:center; z-index:60; background:linear-gradient(180deg, rgba(11,14,28,0.92), rgba(3,6,12,0.95)); flex-direction:column; gap:18px; }
-#finalScreen h1{ color:#ff3b5c; font-size:64px; margin:0; font-weight:900; text-shadow: 0 12px 32px rgba(255,59,92,0.12); }
+#finalScreen h1{ color:var(--valentine-red); font-size:64px; margin:0; font-weight:900; text-shadow: 0 12px 32px rgba(255,59,92,0.12); }
 #finalScreen p{ color: #ffdfe8; font-size:20px; margin:0; }
 
 /* confetti canvas */
 #confetti{ position:fixed; inset:0; pointer-events:none; z-index:46; }
 
-/* small screen */
+/* small screens */
 @media(max-width:720px){
   .title{ font-size:34px }
   #finalScreen h1{ font-size:44px }
@@ -76,15 +106,8 @@ svg#wheel{ width:98%; height:auto; display:block; border-radius:50%; filter: dro
 
   <div class="wheel-box" id="wheelBox">
     <div class="pointer" aria-hidden="true"></div>
-    <!-- SVG layout:
-         - <g id="rotor"> contains slice paths + center hub and is rotated to spin
-         - labels are separate <text> elements (not children of rotor)
-           — we update their x/y every animation frame so they move with rotor but remain horizontal
-    -->
     <svg id="wheel" viewBox="0 0 400 400" role="img" aria-label="Prize wheel" xmlns="http://www.w3.org/2000/svg">
-      <defs></defs>
       <g id="rotor"></g>
-      <!-- labels group (text elements appended here) -->
       <g id="labels"></g>
     </svg>
   </div>
@@ -137,7 +160,6 @@ const sliceColors = ["#ffdce6","#fff0f6","#ffdfe9","#fff7fb","#ffeef6","#fff3f8"
 /* =============================
    DOM REFS
    ============================= */
-const svg = document.getElementById('wheel');
 const rotor = document.getElementById('rotor');
 const labelsGroup = document.getElementById('labels');
 const spinBtn = document.getElementById('spinBtn');
@@ -158,24 +180,23 @@ const TOTAL = slices.length;
 const ARC = 360 / TOTAL;
 const LABEL_RADIUS = R * 0.62;
 
-/* store label elements and their base mid angles so we can update them */
-const labelNodes = []; // { el: SVGTextElement, midAngle }
+/* store label elements and slice path nodes */
+const labelNodes = []; // { el, midAngle }
+const slicePaths = []; // SVGPathElements
 
 /* =============================
-   DRAW SLICES and LABELS (initial)
-   rotor contains geometry that will be rotated via transform
-   labels are separate horizontal <text> elements that we reposition each frame
+   BUILD WHEEL
    ============================= */
 function buildWheel(){
   rotor.innerHTML = '';
   labelsGroup.innerHTML = '';
   labelNodes.length = 0;
+  slicePaths.length = 0;
 
   let start = -90;
   for(let i=0;i<TOTAL;i++){
     const end = start + ARC;
 
-    // slice path
     const x1 = CX + R * Math.cos(start * Math.PI/180);
     const y1 = CY + R * Math.sin(start * Math.PI/180);
     const x2 = CX + R * Math.cos(end * Math.PI/180);
@@ -187,10 +208,9 @@ function buildWheel(){
     path.setAttribute('fill', sliceColors[i % sliceColors.length]);
     path.setAttribute('stroke', 'rgba(0,0,0,0.03)');
     rotor.appendChild(path);
+    slicePaths.push(path);
 
-    // compute mid angle for label (slice center)
-    const mid = (start + end) / 2; // degrees relative to top (-90 start)
-    // create horizontal text in labelsGroup (we'll position by x/y later)
+    const mid = (start + end) / 2; // degrees
     const text = document.createElementNS('http://www.w3.org/2000/svg','text');
     text.setAttribute('font-size', 14);
     text.setAttribute('font-weight', 700);
@@ -200,13 +220,12 @@ function buildWheel(){
     text.setAttribute('dominant-baseline', 'middle');
     text.textContent = `${slices[i].emoji} ${slices[i].label}`;
     labelsGroup.appendChild(text);
-
     labelNodes.push({ el: text, midAngle: mid });
 
     start = end;
   }
 
-  // center hub inside rotor
+  // center hub
   const circle = document.createElementNS('http://www.w3.org/2000/svg','circle');
   circle.setAttribute('cx', CX);
   circle.setAttribute('cy', CY);
@@ -226,26 +245,35 @@ function buildWheel(){
   heart.textContent = '💘';
   rotor.appendChild(heart);
 
-  // initial label placement
   updateLabelPositions(rotation);
 }
 
-/* update label positions so they move around with rotor but remain horizontal */
+/* update labels so they follow rotor but remain horizontal */
 function updateLabelPositions(currentRotationDeg){
   for(const ln of labelNodes){
-    const angle = ln.midAngle + currentRotationDeg; // degrees
+    const angle = ln.midAngle + currentRotationDeg;
     const rad = angle * Math.PI/180;
     const x = CX + LABEL_RADIUS * Math.cos(rad);
     const y = CY + LABEL_RADIUS * Math.sin(rad);
     ln.el.setAttribute('x', x);
-    ln.el.setAttribute('y', y + 3); // small vertical tweak
+    ln.el.setAttribute('y', y + 3);
   }
 }
 
 /* =============================
-   Smooth spin animation that updates rotor transform and label positions
+   Spin math & animation
    ============================= */
-function animateRotation(from, to, duration=1200, easing='easeOut') {
+function computeFinalRotation(currentRotationDeg, targetIndex, minFullSpins=6){
+  const targetMid = (targetIndex + 0.5) * ARC;
+  const desiredOffset = (360 - targetMid) % 360;
+  let final = minFullSpins * 360 + desiredOffset;
+  while(final <= currentRotationDeg + 0.0001){
+    final += 360;
+  }
+  return final;
+}
+
+function animateTo(from, to, duration=1200, easing='easeOut'){
   return new Promise(resolve=>{
     const start = performance.now();
     const diff = to - from;
@@ -256,63 +284,87 @@ function animateRotation(from, to, duration=1200, easing='easeOut') {
     };
     const ease = easeFns[easing] || easeFns.easeOut;
     function frame(now){
-      const t = Math.min(1, (now - start) / duration);
+      const t = Math.min(1, (now - start)/duration);
       const val = from + diff * ease(t);
+      rotation = val;
       rotor.setAttribute('transform', `rotate(${val} ${CX} ${CY})`);
       updateLabelPositions(val);
       if(t < 1) requestAnimationFrame(frame);
-      else { resolve(val); }
+      else resolve(val);
     }
     requestAnimationFrame(frame);
   });
 }
 
-/* small beep for feedback */
 function beep(freq=560, len=0.05){
   try{
     const ctx = new (window.AudioContext || window.webkitAudioContext)();
     const o = ctx.createOscillator();
     const g = ctx.createGain();
     o.type='sine'; o.frequency.value=freq; g.gain.value=0.02;
-    o.connect(g); g.connect(ctx.destination); o.start();
-    setTimeout(()=>{ o.stop(); ctx.close(); }, len*1000);
+    o.connect(g); g.connect(ctx.destination);
+    o.start(); setTimeout(()=>{ o.stop(); ctx.close(); }, len*1000);
   }catch(e){}
 }
 
-/* spin logic: first "fake" random short spin, then smooth snap to target */
 async function spin(){
   if(spinning || confirmed) return;
   spinning = true;
   spinBtn.disabled = true;
   beep(760,0.06);
 
-  const targetIndex = slices.findIndex(s=>s.target);
-  const baseSpins = 6 + Math.floor(Math.random()*2); // 6-7 spins
-  const fakeIndex = Math.floor(Math.random()*TOTAL);
-  const fakeAngle = (fakeIndex + (Math.random()*0.6 - 0.3)) * ARC;
-  const targetAngle = (targetIndex + 0.5) * ARC;
+  const targetIdx = slices.findIndex(s=>s.target);
 
-  const from = rotation % 360;
-  const firstTo = from + baseSpins * 360 + (360 - fakeAngle);
-  const finalTo = from + (baseSpins + 2) * 360 + (360 - targetAngle);
+  // fake quick spin
+  const fakeIdx = Math.floor(Math.random() * TOTAL);
+  const fakeTo = computeFinalRotation(rotation, fakeIdx, 3 + Math.floor(Math.random()*2));
+  await animateTo(rotation, fakeTo, 700, 'cubic');
 
-  // fast-ish fake spin (gives randomness feel)
-  rotation = await animateRotation(from, firstTo, 900, 'cubic');
-  // pause then gentle snap to final
-  await new Promise(r=>setTimeout(r, 200));
-  rotation = await animateRotation(rotation, finalTo, 1400, 'easeOut');
+  await new Promise(r=>setTimeout(r, 160));
 
-  // normalize
+  // final exact spin
+  const finalTo = computeFinalRotation(rotation, targetIdx, 6);
+  await animateTo(rotation, finalTo, 1400, 'easeOut');
+
   rotation = rotation % 360;
   spinning = false;
   spinBtn.disabled = false;
 
-  // open modal
+  // highlight and open modal
+  highlightTarget();
   openModal();
 }
 
 /* =============================
-   Modal behavior (try again / always)
+   Highlighting + reset
+   ============================= */
+function highlightTarget(){
+  const targetIdx = slices.findIndex(s=>s.target);
+  for(let i=0;i<slicePaths.length;i++){
+    if(i === targetIdx){
+      slicePaths[i].classList.add('highlight');
+      labelNodes[i].el.classList.add('highlightLabel');
+    } else {
+      slicePaths[i].classList.remove('highlight');
+      labelNodes[i].el.classList.remove('highlightLabel');
+      slicePaths[i].setAttribute('fill', sliceColors[i % sliceColors.length]);
+    }
+  }
+}
+
+function resetHighlights(){
+  for(let i=0;i<slicePaths.length;i++){
+    slicePaths[i].classList.remove('highlight');
+    labelNodes[i].el.classList.remove('highlightLabel');
+    slicePaths[i].setAttribute('fill', sliceColors[i % sliceColors.length]);
+    labelNodes[i].el.setAttribute('fill', 'var(--slice-text)');
+    labelNodes[i].el.setAttribute('font-size', 14);
+    labelNodes[i].el.setAttribute('font-weight', 700);
+  }
+}
+
+/* =============================
+   Modal / Try again / Always
    ============================= */
 function openModal(){
   modalText.textContent = `Dear ${HEROINE_NAME}, will you be my Valentine? — ${YOUR_NAME}`;
@@ -322,35 +374,31 @@ function openModal(){
 
 tryAgainBtn.addEventListener('click', ()=>{
   modal.style.display = 'none';
+  resetHighlights();
 });
 
 alwaysBtn.addEventListener('click', ()=>{
   if(confirmed) return;
   confirmed = true;
   modal.style.display = 'none';
-
-  // heart burst + confetti
   makeHeartBurst(44);
   playConfetti(220);
-
-  // hide wheel/controls and show final
   setTimeout(()=>{
     document.getElementById('mainUI').style.display = 'none';
     finalScreen.style.display = 'flex';
-  }, 500);
+  }, 600);
 });
 
 function nudge(){ beep(260,0.04); }
 
 /* =============================
-   Confetti + heart burst (canvas)
+   Confetti & heart burst
    ============================= */
 const canvas = confettiCanvas;
 const ctx = canvas.getContext('2d');
 let parts = [];
 function resizeCanvas(){ canvas.width = innerWidth; canvas.height = innerHeight; }
 window.addEventListener('resize', resizeCanvas); resizeCanvas();
-
 function rand(min,max){ return Math.random()*(max-min)+min; }
 
 function makeConfetti(n=100){
@@ -369,7 +417,6 @@ function makeConfetti(n=100){
   }
   if(!confRunning) updateConfetti();
 }
-
 function makeHeartBurst(n=36){
   for(let i=0;i<n;i++){
     parts.push({
@@ -386,7 +433,6 @@ function makeHeartBurst(n=36){
   }
   if(!confRunning) updateConfetti();
 }
-
 let confRunning = false;
 function updateConfetti(){
   confRunning = true;
@@ -396,12 +442,9 @@ function updateConfetti(){
     p.x += p.vx; p.y += p.vy; p.rot += p.vr; p.vy += 0.08;
     ctx.save(); ctx.translate(p.x,p.y); ctx.rotate(p.rot*Math.PI/180);
     if(p.heart){
-      ctx.font = `${p.size}px serif`;
-      ctx.fillStyle = p.color;
-      ctx.fillText("❤", -p.size/2, p.size/2);
+      ctx.font = `${p.size}px serif`; ctx.fillStyle = p.color; ctx.fillText("❤", -p.size/2, p.size/2);
     } else {
-      ctx.fillStyle = p.color;
-      ctx.fillRect(-p.size/2, -p.size/2, p.size, p.size*0.6);
+      ctx.fillStyle = p.color; ctx.fillRect(-p.size/2, -p.size/2, p.size, p.size*0.6);
     }
     ctx.restore();
     if(p.y > canvas.height + 80){ parts.splice(i,1); i--; }
@@ -409,11 +452,10 @@ function updateConfetti(){
   if(parts.length > 0) requestAnimationFrame(updateConfetti);
   else confRunning = false;
 }
-
 function playConfetti(n=120){ makeConfetti(n); }
 
 /* =============================
-   Background small hearts (decor)
+   Background small hearts
    ============================= */
 const heartContainer = document.getElementById('hearts');
 const heartEmojis = ["❤️","💕","💖"];
