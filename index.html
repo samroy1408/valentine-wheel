@@ -3,94 +3,169 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>Will You? — Spin the Love Wheel (final fix)</title>
-<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;600;800&display=swap" rel="stylesheet">
+<title>Will You?</title>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;700;800&display=swap" rel="stylesheet">
 <style>
 :root{
-  --bg1:#0b1020; --bg2:#151a33;
-  --accent:#ff4d8d; --accent2:#ff96b8; --muted:#bfc4d0; --slice-text:#2b2b2f;
-  --valentine-red: #ff3b5c;
-  --modal-green-start: #e2ffe8;
-  --modal-green-end:   #cfffe0;
-  --modal-text: #083f2b;
+  --bg1:#0b1020;
+  --bg2:#151a33;
+  --accent:#ff4d8d;
+  --accent2:#ff96b8;
+  --valentine-red:#ff3b5c;
 }
+
 *{box-sizing:border-box}
-html,body{height:100%; margin:0}
+html,body{
+  height:100%;
+  margin:0;
+  overflow:hidden;
+}
+
 body{
-  background: linear-gradient(180deg,var(--bg1),var(--bg2));
-  color:var(--muted);
-  font-family:"Poppins",system-ui,-apple-system,Segoe UI,Roboto,Arial;
-  display:flex; align-items:center; justify-content:center; padding:20px; overflow:hidden;
+  background:linear-gradient(180deg,var(--bg1),var(--bg2));
+  font-family:"Poppins",sans-serif;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  color:white;
 }
 
-/* falling hearts */
-.hearts{ position:fixed; inset:0; pointer-events:none; z-index:0; }
-.heart{ position:absolute; opacity:0.22; animation: fall linear infinite; transform-origin:center; }
-@keyframes fall{ from{ transform:translateY(-10vh) rotate(0deg)} to{ transform:translateY(110vh) rotate(360deg)} }
-
-/* layout */
-.container{ width:100%; max-width:920px; text-align:center; position:relative; z-index:3; }
-.title{ color:var(--accent); font-size:40px; margin:6px 0 4px 0; font-weight:800; }
-.subtitle{ color:var(--muted); margin:0 0 18px 0; font-weight:300; }
-
-/* wheel */
-.wheel-box{ width:100%; max-width:540px; margin:0 auto; position:relative; }
-svg#wheel{ width:98%; height:auto; display:block; border-radius:50%; filter: drop-shadow(0 18px 40px rgba(2,6,23,0.6)); background: transparent; }
-.pointer{ position:absolute; top:2%; left:50%; transform:translateX(-50%); z-index:40; pointer-events:none; }
-.pointer::after{ content:""; display:block; width:0;height:0; border-left:18px solid transparent; border-right:18px solid transparent; border-bottom:32px solid var(--accent); filter: drop-shadow(0 6px 14px rgba(0,0,0,0.35)); border-radius:2px; }
-
-/* spin button */
-.spin{ margin:18px auto 6px auto; padding:14px 30px; border-radius:999px; background:linear-gradient(90deg,var(--accent),var(--accent2)); color:white; border:none; font-weight:800; font-size:16px; cursor:pointer; box-shadow:0 10px 30px rgba(255,77,141,0.12); }
-
-/* banner */
-.banner{ color:var(--accent); font-weight:800; margin-top:8px; text-shadow:0 6px 20px rgba(255,77,141,0.08); }
-
-/* modal (light green stronger) */
-.modal{ position:fixed; inset:0; display:none; align-items:center; justify-content:center; z-index:40; }
-.modal-bg{ position:absolute; inset:0; background:linear-gradient(180deg, rgba(3,6,12,0.18), rgba(3,6,12,0.22)); }
-.card{ position:relative; z-index:42; background: linear-gradient(180deg,var(--modal-green-start),var(--modal-green-end)); padding:22px; border-radius:12px; border:1px solid rgba(7,90,62,0.08); color:var(--modal-text); text-align:center; width:min(92%,520px); box-shadow: 0 12px 30px rgba(2,6,8,0.06); }
-.card h2{ color:var(--valentine-red); margin:0 0 8px 0; }
-.card p{ margin:0 0 12px 0; color:var(--modal-text); }
-.btn-row{ display:flex; gap:12px; justify-content:center; margin-top:12px; flex-wrap:wrap; }
-.btn { padding:10px 14px; border-radius:10px; border:none; font-weight:800; cursor:pointer; }
-.btn.ghost{ background:transparent; color:var(--modal-text); border:1px solid rgba(7,90,62,0.08); }
-.btn.accept{ background:var(--valentine-red); color:white; }
-
-/* highlight animation for selected slice */
-path.highlight {
-  fill: var(--valentine-red) !important;
-  stroke: rgba(0,0,0,0.08);
-  transform-box: fill-box;
-  transform-origin: 200px 200px;
-  animation: slicePulse 1.6s infinite;
-  filter: drop-shadow(0 10px 26px rgba(255,59,92,0.32));
-}
-@keyframes slicePulse{
-  0% { transform: scale(1); }
-  50% { transform: scale(1.025); }
-  100% { transform: scale(1); }
+/* Container scaled to always fit screen */
+.container{
+  width:100%;
+  max-width:700px;
+  height:100vh;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  text-align:center;
+  gap:10px;
 }
 
-/* highlighted label style */
-text.highlightLabel {
-  font-size:16px !important;
-  font-weight:900 !important;
-  fill:#ffffff !important;
+h1{
+  margin:0;
+  font-size:36px;
+  color:var(--accent);
 }
 
-/* final full-screen message */
-#finalScreen{ position:fixed; inset:0; display:none; align-items:center; justify-content:center; z-index:60; background:linear-gradient(180deg, rgba(11,14,28,0.92), rgba(3,6,12,0.95)); flex-direction:column; gap:18px; }
-#finalScreen h1{ color:var(--valentine-red); font-size:64px; margin:0; font-weight:900; text-shadow: 0 12px 32px rgba(255,59,92,0.12); }
-#finalScreen p{ color: #ffdfe8; font-size:20px; margin:0; }
+.subtitle{
+  font-size:14px;
+  opacity:0.8;
+  margin-bottom:5px;
+}
 
-/* confetti canvas */
-#confetti{ position:fixed; inset:0; pointer-events:none; z-index:46; }
+/* Wheel */
+.wheel-box{
+  width:90vw;
+  max-width:420px;
+  position:relative;
+}
 
-/* small screens */
-@media(max-width:720px){
-  .title{ font-size:34px }
-  #finalScreen h1{ font-size:44px }
-  .pointer::after{ border-left:14px solid transparent; border-right:14px solid transparent; border-bottom:24px solid var(--accent); }
+svg{
+  width:100%;
+}
+
+.pointer{
+  position:absolute;
+  top:0;
+  left:50%;
+  transform:translateX(-50%);
+  width:0;height:0;
+  border-left:15px solid transparent;
+  border-right:15px solid transparent;
+  border-bottom:25px solid var(--accent);
+}
+
+/* Button */
+.spin{
+  margin-top:10px;
+  padding:12px 28px;
+  border-radius:999px;
+  background:linear-gradient(90deg,var(--accent),var(--accent2));
+  border:none;
+  color:white;
+  font-weight:800;
+  font-size:15px;
+  cursor:pointer;
+}
+
+/* Modal */
+.modal{
+  position:fixed;
+  inset:0;
+  display:none;
+  align-items:center;
+  justify-content:center;
+  background:rgba(0,0,0,0.3);
+}
+
+.card{
+  background:linear-gradient(180deg,#e2ffe8,#cfffe0);
+  padding:20px;
+  border-radius:12px;
+  color:#083f2b;
+  width:90%;
+  max-width:400px;
+}
+
+.btn-row{
+  margin-top:12px;
+  display:flex;
+  gap:10px;
+  justify-content:center;
+}
+
+.btn{
+  padding:8px 12px;
+  border-radius:8px;
+  border:none;
+  font-weight:700;
+  cursor:pointer;
+}
+
+.ghost{
+  background:white;
+}
+
+.accept{
+  background:var(--valentine-red);
+  color:white;
+}
+
+/* Final screen */
+#finalScreen{
+  position:fixed;
+  inset:0;
+  display:none;
+  align-items:center;
+  justify-content:center;
+  flex-direction:column;
+  background:linear-gradient(180deg,#0b1020,#151a33);
+}
+
+#finalScreen h1{
+  color:var(--valentine-red);
+  font-size:48px;
+  margin:0;
+}
+
+/* Falling hearts */
+.hearts{
+  position:fixed;
+  inset:0;
+  pointer-events:none;
+}
+
+.heart{
+  position:absolute;
+  opacity:0.25;
+  animation:fall linear infinite;
+}
+
+@keyframes fall{
+  from{transform:translateY(-10vh) rotate(0deg)}
+  to{transform:translateY(110vh) rotate(360deg)}
 }
 </style>
 </head>
@@ -99,413 +174,107 @@ text.highlightLabel {
 <div class="hearts" id="hearts"></div>
 
 <div class="container" id="mainUI">
-  <div class="title">Will You?</div>
+  <h1>Will You?</h1>
   <div class="subtitle">Spin the wheel and see your surprise 💫</div>
 
-  <div class="wheel-box" id="wheelBox">
-    <div class="pointer" aria-hidden="true"></div>
-    <svg id="wheel" viewBox="0 0 400 400" role="img" aria-label="Prize wheel" xmlns="http://www.w3.org/2000/svg">
-      <g id="rotor"></g>
-      <g id="labels"></g>
-    </svg>
+  <div class="wheel-box">
+    <div class="pointer"></div>
+    <svg id="wheel" viewBox="0 0 400 400"></svg>
   </div>
 
-  <button id="spinBtn" class="spin">SPIN IT! 🎡</button>
-  <div class="banner">Louie loves Hulky ❤️</div>
+  <button class="spin" id="spinBtn">SPIN IT! 🎡</button>
 </div>
 
-<!-- modal -->
 <div class="modal" id="modal">
-  <div class="modal-bg" onclick="nudge()"></div>
-  <div class="card" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
-    <h2 id="modalTitle">Hulky ❤️</h2>
-    <p id="modalText">Dear Hulky, will you be my Valentine? — Louie</p>
+  <div class="card">
+    <h3>Hulky ❤️</h3>
+    <p>Will you be my Valentine? — Louie</p>
     <div class="btn-row">
-      <button class="btn ghost" id="tryAgainBtn">Didn't like it — try again</button>
+      <button class="btn ghost" id="tryAgainBtn">Try again</button>
       <button class="btn accept" id="alwaysBtn">Always 💘</button>
     </div>
   </div>
 </div>
 
-<!-- final -->
-<div id="finalScreen" aria-live="polite">
-  <h1 id="finalTitle">Hulky — I love you</h1>
-  <p id="finalSub">Forever and always. ❤️</p>
+<div id="finalScreen">
+  <h1>Hulky ❤️ I Love You</h1>
 </div>
 
-<canvas id="confetti"></canvas>
-
 <script>
-/* =============================
-   PERSONALIZATION + DATA
-   ============================= */
-const YOUR_NAME = "Louie";
-const HEROINE_NAME = "Hulky";
-
-/* slices: removed Flowers; rebalanced colors below */
-const slices = [
-  { label: "Kiss", emoji: "😘" },
-  { label: "Hug", emoji: "🤗" },
-  { label: "Chocolate", emoji: "🍫" },
-  { label: "Surprise", emoji: "🎁" },
-  { label: "Date Night", emoji: "🌃" },
-  { label: "Movie", emoji: "🎬" },
-  { label: "Be my Valentine", emoji: "💘", target:true }
+const slices=[
+"Kiss 😘","Hug 🤗","Chocolate 🍫",
+"Surprise 🎁","Date Night 🌃",
+"Movie 🎬","Be my Valentine 💘"
 ];
 
-/* Rebalance color array to match slice count exactly */
-const sliceColors = (() => {
-  // pleasing pink palette equal to slice count
-  const palette = ["#ffdce6","#fff0f6","#ffdfe9","#fff7fb","#ffeef6","#fff3f8","#ffcfe0"];
-  // if the palette length differs, generate a repeated map trimmed to length
-  if(palette.length >= slices.length) return palette.slice(0, slices.length);
-  const out = [];
-  for(let i=0;i<slices.length;i++) out.push(palette[i % palette.length]);
-  return out;
-})();
+const colors=["#ffdce6","#fff0f6","#ffdfe9","#fff7fb","#ffeef6","#fff3f8","#ffcfe0"];
 
-/* =============================
-   DOM REFS
-   ============================= */
-const rotor = document.getElementById('rotor');
-const labelsGroup = document.getElementById('labels');
-const spinBtn = document.getElementById('spinBtn');
-const modal = document.getElementById('modal');
-const tryAgainBtn = document.getElementById('tryAgainBtn');
-const alwaysBtn = document.getElementById('alwaysBtn');
-const finalScreen = document.getElementById('finalScreen');
-const confettiCanvas = document.getElementById('confetti');
-const modalText = document.getElementById('modalText');
+const svg=document.getElementById("wheel");
+const spinBtn=document.getElementById("spinBtn");
+const modal=document.getElementById("modal");
+const tryAgainBtn=document.getElementById("tryAgainBtn");
+const alwaysBtn=document.getElementById("alwaysBtn");
+const finalScreen=document.getElementById("finalScreen");
 
-let rotation = 0;           // current rotor rotation in degrees (absolute)
-let spinning = false;
-let confirmed = false;
+let rotation=0;
+let spinning=false;
 
-/* geometry */
-const CX = 200, CY = 200, R = 190;
-const TOTAL = slices.length;
-const ARC = 360 / TOTAL;
-const LABEL_RADIUS = R * 0.62;
-
-/* store label elements and slice path nodes */
-const labelNodes = []; // { el, midAngle }
-const slicePaths = []; // SVGPathElements
-
-/* =============================
-   BUILD WHEEL
-   ============================= */
-function buildWheel(){
-  rotor.innerHTML = '';
-  labelsGroup.innerHTML = '';
-  labelNodes.length = 0;
-  slicePaths.length = 0;
-
-  let start = -90;
-  for(let i=0;i<TOTAL;i++){
-    const end = start + ARC;
-
-    const x1 = CX + R * Math.cos(start * Math.PI/180);
-    const y1 = CY + R * Math.sin(start * Math.PI/180);
-    const x2 = CX + R * Math.cos(end * Math.PI/180);
-    const y2 = CY + R * Math.sin(end * Math.PI/180);
-
-    const path = document.createElementNS('http://www.w3.org/2000/svg','path');
-    const d = `M ${CX} ${CY} L ${x1} ${y1} A ${R} ${R} 0 0 1 ${x2} ${y2} Z`;
-    path.setAttribute('d', d);
-    path.setAttribute('fill', sliceColors[i % sliceColors.length]);
-    path.setAttribute('stroke', 'rgba(0,0,0,0.03)');
-    rotor.appendChild(path);
-    slicePaths.push(path);
-
-    const mid = (start + end) / 2; // degrees
-    const text = document.createElementNS('http://www.w3.org/2000/svg','text');
-    text.setAttribute('font-size', 14);
-    text.setAttribute('font-weight', 700);
-    text.setAttribute('fill', 'var(--slice-text)');
-    text.style.fontFamily = '"Poppins", system-ui, sans-serif';
-    text.setAttribute('text-anchor', 'middle');
-    text.setAttribute('dominant-baseline', 'middle');
-    text.textContent = `${slices[i].emoji} ${slices[i].label}`;
-    labelsGroup.appendChild(text);
-    labelNodes.push({ el: text, midAngle: mid });
-
-    start = end;
-  }
-
-  // center hub
-  const circle = document.createElementNS('http://www.w3.org/2000/svg','circle');
-  circle.setAttribute('cx', CX);
-  circle.setAttribute('cy', CY);
-  circle.setAttribute('r', 46);
-  circle.setAttribute('fill', '#fff7fb');
-  circle.setAttribute('stroke', 'rgba(0,0,0,0.04)');
-  rotor.appendChild(circle);
-
-  const heart = document.createElementNS('http://www.w3.org/2000/svg','text');
-  heart.setAttribute('x', CX);
-  heart.setAttribute('y', CY + 6);
-  heart.setAttribute('text-anchor', 'middle');
-  heart.setAttribute('font-size', 26);
-  heart.setAttribute('font-weight', 800);
-  heart.setAttribute('fill', 'var(--accent)');
-  heart.style.fontFamily = '"Poppins", system-ui, sans-serif';
-  heart.textContent = '💘';
-  rotor.appendChild(heart);
-
-  updateLabelPositions(rotation);
-}
-
-/* update labels so they follow rotor but remain horizontal */
-function updateLabelPositions(currentRotationDeg){
-  for(const ln of labelNodes){
-    const angle = ln.midAngle + currentRotationDeg;
-    const rad = angle * Math.PI/180;
-    const x = CX + LABEL_RADIUS * Math.cos(rad);
-    const y = CY + LABEL_RADIUS * Math.sin(rad);
-    ln.el.setAttribute('x', x);
-    ln.el.setAttribute('y', y + 3);
+function drawWheel(){
+  const cx=200,cy=200,r=190;
+  const arc=360/slices.length;
+  let start=-90;
+  for(let i=0;i<slices.length;i++){
+    const end=start+arc;
+    const x1=cx+r*Math.cos(start*Math.PI/180);
+    const y1=cy+r*Math.sin(start*Math.PI/180);
+    const x2=cx+r*Math.cos(end*Math.PI/180);
+    const y2=cy+r*Math.sin(end*Math.PI/180);
+    const path=document.createElementNS("http://www.w3.org/2000/svg","path");
+    const d=`M ${cx} ${cy} L ${x1} ${y1} A ${r} ${r} 0 0 1 ${x2} ${y2} Z`;
+    path.setAttribute("d",d);
+    path.setAttribute("fill",colors[i]);
+    svg.appendChild(path);
+    start=end;
   }
 }
+drawWheel();
 
-/* =============================
-   Robust spin math & animation (FIX)
-   - normalize current rotation
-   - compute exact absolute final rotation > current
-   - animate to final
-   - SNAP exactly to desired final at the end to avoid float drift
-   ============================= */
-function normalizeDeg(d){
-  return ((d % 360) + 360) % 360;
-}
-
-function computeFinalRotationStrict(currentRotationDeg, targetIndex, minFullSpins=6){
-  // target mid angle relative to top (-90 start)
-  const targetMid = (targetIndex + 0.5) * ARC; // degrees
-  // rotor angle needed so target sits under pointer:
-  const desiredOffset = (360 - targetMid) % 360;
-  // base final
-  let final = minFullSpins * 360 + desiredOffset;
-  // ensure it's strictly greater than current absolute rotation
-  while(final <= currentRotationDeg + 1e-6){
-    final += 360;
-  }
-  return final;
-}
-
-function animateTo(from, to, duration=1200, easing='easeOut'){
-  return new Promise(resolve=>{
-    const start = performance.now();
-    const diff = to - from;
-    const easeFns = {
-      linear: t => t,
-      cubic: t => --t*t*t+1,
-      easeOut: t => 1 - Math.pow(1 - t, 3)
-    };
-    const ease = easeFns[easing] || easeFns.easeOut;
-    function frame(now){
-      const t = Math.min(1, (now - start)/duration);
-      const val = from + diff * ease(t);
-      rotation = val;
-      rotor.setAttribute('transform', `rotate(${val} ${CX} ${CY})`);
-      updateLabelPositions(val);
-      if(t < 1) requestAnimationFrame(frame);
-      else resolve(val);
-    }
-    requestAnimationFrame(frame);
-  });
-}
-
-/* small beep */
-function beep(freq=560, len=0.05){
-  try{
-    const ctx = new (window.AudioContext || window.webkitAudioContext)();
-    const o = ctx.createOscillator();
-    const g = ctx.createGain();
-    o.type='sine'; o.frequency.value=freq; g.gain.value=0.02;
-    o.connect(g); g.connect(ctx.destination);
-    o.start(); setTimeout(()=>{ o.stop(); ctx.close(); }, len*1000);
-  }catch(e){}
-}
-
-/* spin routine with strict snap at end */
-async function spin(){
-  if(spinning || confirmed) return;
-  spinning = true;
-  spinBtn.disabled = true;
-  beep(760,0.06);
-
-  const targetIdx = slices.findIndex(s=>s.target);
-
-  // quick fake spin to look random
-  const fakeIdx = Math.floor(Math.random() * TOTAL);
-  // use smaller spins for fake so the final still feels like a proper long spin
-  const fakeTo = computeFinalRotationStrict(rotation, fakeIdx, 3 + Math.floor(Math.random()*2));
-  await animateTo(rotation, fakeTo, 700, 'cubic');
-  await new Promise(r=>setTimeout(r, 150));
-
-  // compute true final and animate
-  const finalTo = computeFinalRotationStrict(rotation, targetIdx, 6);
-  await animateTo(rotation, finalTo, 1400, 'easeOut');
-
-  // SNAP exactly in case of float errors:
-  // desired rotor angle that aligns target exactly:
-  const normalizedFinal = normalizeDeg(finalTo);
-  rotation = normalizedFinal; // set absolute to normalized angle
-  rotor.setAttribute('transform', `rotate(${rotation} ${CX} ${CY})`);
-  updateLabelPositions(rotation);
-
-  // done
-  spinning = false;
-  spinBtn.disabled = false;
-
-  // highlight & modal
-  highlightTarget();
-  openModal();
-}
-
-/* =============================
-   Highlighting + reset
-   ============================= */
-function highlightTarget(){
-  const targetIdx = slices.findIndex(s=>s.target);
-  for(let i=0;i<slicePaths.length;i++){
-    if(i === targetIdx){
-      slicePaths[i].classList.add('highlight');
-      labelNodes[i].el.classList.add('highlightLabel');
-    } else {
-      slicePaths[i].classList.remove('highlight');
-      labelNodes[i].el.classList.remove('highlightLabel');
-      slicePaths[i].setAttribute('fill', sliceColors[i % sliceColors.length]);
-    }
-  }
-}
-
-function resetHighlights(){
-  for(let i=0;i<slicePaths.length;i++){
-    slicePaths[i].classList.remove('highlight');
-    labelNodes[i].el.classList.remove('highlightLabel');
-    slicePaths[i].setAttribute('fill', sliceColors[i % sliceColors.length]);
-    labelNodes[i].el.setAttribute('fill', 'var(--slice-text)');
-    labelNodes[i].el.setAttribute('font-size', 14);
-    labelNodes[i].el.setAttribute('font-weight', 700);
-  }
-}
-
-/* =============================
-   Modal / Try again / Always
-   ============================= */
-function openModal(){
-  modalText.textContent = `Dear ${HEROINE_NAME}, will you be my Valentine? — ${YOUR_NAME}`;
-  modal.style.display = 'flex';
-  playConfetti(60);
-}
-
-tryAgainBtn.addEventListener('click', ()=>{
-  modal.style.display = 'none';
-  resetHighlights();
-});
-
-alwaysBtn.addEventListener('click', ()=>{
-  if(confirmed) return;
-  confirmed = true;
-  modal.style.display = 'none';
-  makeHeartBurst(44);
-  playConfetti(220);
+function spin(){
+  if(spinning) return;
+  spinning=true;
+  const targetIndex=slices.findIndex(s=>s.includes("Valentine"));
+  const arc=360/slices.length;
+  const finalRotation=6*360+(360-(targetIndex+0.5)*arc);
+  rotation+=finalRotation;
+  svg.style.transition="transform 1.4s cubic-bezier(.2,.9,.2,1)";
+  svg.style.transform=`rotate(${rotation}deg)`;
   setTimeout(()=>{
-    document.getElementById('mainUI').style.display = 'none';
-    finalScreen.style.display = 'flex';
-  }, 600);
-});
-
-function nudge(){ beep(260,0.04); }
-
-/* =============================
-   Confetti & heart burst
-   ============================= */
-const canvas = confettiCanvas;
-const ctx = canvas.getContext('2d');
-let parts = [];
-function resizeCanvas(){ canvas.width = innerWidth; canvas.height = innerHeight; }
-window.addEventListener('resize', resizeCanvas); resizeCanvas();
-function rand(min,max){ return Math.random()*(max-min)+min; }
-
-function makeConfetti(n=100){
-  const cols = ['#ff6b9a','#ffdce6','#ff9fb8','#fff0f6','#ffc6de'];
-  for(let i=0;i<n;i++){
-    parts.push({
-      x: rand(0,canvas.width),
-      y: -rand(0,canvas.height),
-      vx: rand(-2.5,2.5),
-      vy: rand(2,6),
-      size: rand(6,12),
-      rot: rand(0,360),
-      vr: rand(-6,6),
-      color: cols[Math.floor(rand(0,cols.length))]
-    });
-  }
-  if(!confRunning) updateConfetti();
+    spinning=false;
+    modal.style.display="flex";
+  },1500);
 }
-function makeHeartBurst(n=36){
-  for(let i=0;i<n;i++){
-    parts.push({
-      x: canvas.width/2 + rand(-60,60),
-      y: canvas.height/2 + rand(-30,30),
-      vx: rand(-6,6),
-      vy: rand(-6,2),
-      size: rand(18,34),
-      rot: rand(0,360),
-      vr: rand(-9,9),
-      color: "#ff4d8d",
-      heart:true
-    });
-  }
-  if(!confRunning) updateConfetti();
-}
-let confRunning = false;
-function updateConfetti(){
-  confRunning = true;
-  ctx.clearRect(0,0,canvas.width,canvas.height);
-  for(let i=0;i<parts.length;i++){
-    const p = parts[i];
-    p.x += p.vx; p.y += p.vy; p.rot += p.vr; p.vy += 0.08;
-    ctx.save(); ctx.translate(p.x,p.y); ctx.rotate(p.rot*Math.PI/180);
-    if(p.heart){
-      ctx.font = `${p.size}px serif`; ctx.fillStyle = p.color; ctx.fillText("❤", -p.size/2, p.size/2);
-    } else {
-      ctx.fillStyle = p.color; ctx.fillRect(-p.size/2, -p.size/2, p.size, p.size*0.6);
-    }
-    ctx.restore();
-    if(p.y > canvas.height + 80){ parts.splice(i,1); i--; }
-  }
-  if(parts.length > 0) requestAnimationFrame(updateConfetti);
-  else confRunning = false;
-}
-function playConfetti(n=120){ makeConfetti(n); }
 
-/* =============================
-   Background small hearts
-   ============================= */
-const heartContainer = document.getElementById('hearts');
-const heartEmojis = ["❤️","💕","💖"];
-for(let i=0;i<28;i++){
-  const s = document.createElement('span');
-  s.className = 'heart';
-  s.textContent = heartEmojis[Math.floor(Math.random()*heartEmojis.length)];
-  s.style.left = (Math.random()*100) + 'vw';
-  s.style.animationDuration = (4 + Math.random()*6) + 's';
-  s.style.fontSize = (10 + Math.random()*22) + 'px';
-  s.style.top = (-10 - Math.random()*30) + 'vh';
+spinBtn.onclick=spin;
+tryAgainBtn.onclick=()=>modal.style.display="none";
+alwaysBtn.onclick=()=>{
+  modal.style.display="none";
+  document.getElementById("mainUI").style.display="none";
+  finalScreen.style.display="flex";
+};
+
+/* background hearts */
+const heartContainer=document.getElementById("hearts");
+["❤️","💕","💖"].forEach(()=>{});
+for(let i=0;i<20;i++){
+  const s=document.createElement("span");
+  s.className="heart";
+  s.innerText=["❤️","💕","💖"][Math.floor(Math.random()*3)];
+  s.style.left=Math.random()*100+"vw";
+  s.style.animationDuration=4+Math.random()*6+"s";
+  s.style.fontSize=10+Math.random()*20+"px";
   heartContainer.appendChild(s);
 }
-
-/* =============================
-   Init wiring
-   ============================= */
-buildWheel();
-spinBtn.addEventListener('click', spin);
-window.addEventListener('keydown', e => {
-  if((e.key === ' ' || e.key === 'Enter') && !spinning && !confirmed){ e.preventDefault(); spin(); }
-});
 </script>
+
 </body>
 </html>
