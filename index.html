@@ -142,8 +142,8 @@ text.highlightLabel{ font-size:16px !important; font-weight:900 !important; fill
 
 <!-- final screen -->
 <div class="final-screen" id="finalScreen" role="region" aria-live="polite">
-  <h1 id="finalTitle">Hulky — I love you</h1>
-  <p id="finalSub">Forever and always. ❤️</p>
+  <h1 id="finalTitle">Louie loves Hulky ❤️</h1>
+  <p id="finalSub">Forever and always.</p>
 </div>
 
 <script>
@@ -363,23 +363,11 @@ async function spin(){
 function openModal(){
   modalText.textContent = `Dear ${HEROINE_NAME}, will you be my Valentine? — ${YOUR_NAME}`;
   modal.style.display = 'flex';
-  // gentle confetti burst (non-blocking)
   playConfetti(60);
 }
 tryAgainBtn.addEventListener('click', ()=>{
   modal.style.display = 'none';
   resetHighlights();
-});
-alwaysBtn.addEventListener('click', ()=>{
-  if(confirmed) return;
-  confirmed = true;
-  modal.style.display = 'none';
-  makeHeartBurst(44);
-  playConfetti(220);
-  setTimeout(()=>{
-    document.getElementById('app').style.display = 'none';
-    finalScreen.style.display = 'flex';
-  }, 600);
 });
 
 /* ======= Confetti & heartburst canvas ======= */
@@ -411,7 +399,7 @@ function makeConfetti(n=100){
   }
   if(!confRunning) updateConfetti();
 }
-function makeHeartBurst(n=36){
+function makeHeartBurstReal(n=36){
   for(let i=0;i<n;i++){
     particles.push({
       x: confettiCanvas.width/2 + rand(-60,60),
@@ -480,8 +468,20 @@ window.addEventListener('keydown', e => {
   if((e.key === ' ' || e.key === 'Enter') && !spinning && !confirmed){ e.preventDefault(); spin(); }
 });
 
-/* expose helper for confetti usage inside modal actions */
-function makeHeartBurst(n){ makeHeartBurst(n); } // alias (keeps naming used earlier)
+/* ======= FIXED Always handler (calls real heart burst function) ======= */
+alwaysBtn.addEventListener('click', ()=>{
+  if(confirmed) return;
+  confirmed = true;
+  modal.style.display = 'none';
+  // call the real heart burst and confetti functions
+  makeHeartBurstReal(44);
+  playConfetti(220);
+  setTimeout(()=>{
+    document.getElementById('app').style.display = 'none';
+    finalScreen.style.display = 'flex';
+  }, 600);
+});
+
 </script>
 </body>
 </html>
