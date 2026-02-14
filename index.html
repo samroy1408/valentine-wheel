@@ -19,10 +19,10 @@ body{background:linear-gradient(180deg,var(--bg-top),var(--bg-bottom)); color:va
 /* container centered and sized to viewport */
 .container{ width:100%; max-width:820px; height:100vh; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:8px; text-align:center; }
 .title{ color:var(--accent); font-size:36px; margin:0; font-weight:800 }
-.subtitle{ font-size:14px; margin:0; color:var(--muted) }
+.subtitle{ font-size:14px; margin:0; color:var(--muted); margin-bottom:18px; /* increased gap */ }
 
 /* wheel */
-.wheel-wrap{ width:clamp(260px,48vw,520px); position:relative; }
+.wheel-wrap{ width:clamp(260px,48vw,520px); position:relative; margin-top:10px; /* ensure gap */ }
 .pointer{ position:absolute; top:8px; left:50%; transform:translateX(-50%); z-index:30; width:0;height:0; border-left:18px solid transparent; border-right:18px solid transparent; border-bottom:28px solid var(--accent); filter:drop-shadow(0 8px 22px rgba(0,0,0,0.35)); }
 #wheel{ width:100%; height:auto; transform-origin:200px 200px; display:block; }
 
@@ -64,6 +64,7 @@ text.highlightLabel{ font-size:16px !important; font-weight:900 !important; fill
 
   <div class="wheel-wrap">
     <div class="pointer" aria-hidden="true"></div>
+    <!-- SVG wheel; rotor will be rotated, labels positioned separately so they're always upright -->
     <svg id="wheel" viewBox="0 0 400 400" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Love wheel">
       <g id="rotor"></g>
       <g id="labels"></g>
@@ -132,7 +133,7 @@ const LABEL_RADIUS = R * 0.62;
 const labelNodes = [];
 const slicePaths = [];
 
-/* ---------- build wheel ---------- */
+/* ======= build wheel ======= */
 function buildWheel(){
   rotor.innerHTML=''; labelsGroup.innerHTML=''; labelNodes.length=0; slicePaths.length=0;
   let start=-90;
@@ -243,14 +244,11 @@ tryAgainBtn.addEventListener('click', ()=>{ modal.style.display='none'; resetHig
 
 /* ---------- ALWAYS handler (fixed) ---------- */
 alwaysBtn.addEventListener('click', ()=>{
-  if(confirmed) return; // guard
+  if(confirmed) return;
   confirmed = true;
-  // close modal immediately
   modal.style.display = 'none';
-  // visual celebration
   spawnHearts(44);
   spawnConfetti(160);
-  // hide main UI after short delay so bursts are visible
   setTimeout(()=>{
     document.getElementById('app').style.display = 'none';
     finalScreen.style.display = 'flex';
